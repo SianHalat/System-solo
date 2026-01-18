@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V49 - World Expansion</title>
+    <title>SYSTEM V50 - Boss Encounter</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -12,6 +12,8 @@
             --gold: #ffd700;
             --red: #ff3333; 
             --green: #33ff33;
+            --orange: #ffa500;
+            --white: #ffffff;
             --gray: #444;
             --bg: #02050a;
             --sys-text-glow: 0 0 8px var(--blue);
@@ -110,7 +112,6 @@
         .q-complete { color: var(--blue); text-shadow: 0 0 5px var(--blue); } 
         .q-over { color: var(--blue); font-weight: bold; text-shadow: 0 0 8px var(--blue); }
 
-        /* ZONE SELECTOR */
         .zone-selector {
             width: 100%; padding: 10px; margin-bottom: 20px;
             background: rgba(0,0,0,0.8); color: var(--blue);
@@ -119,10 +120,11 @@
         }
 
         .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
-        .mon-white { color: #fff; }
-        .mon-orange { color: #FFA500; text-shadow: 0 0 5px #FFA500; } 
-        .mon-red { color: var(--red); text-shadow: 0 0 5px var(--red); }
-        .mon-purple { color: var(--purple); text-shadow: 0 0 5px var(--purple); font-weight:bold;}
+        .mon-white { color: var(--white); }
+        .mon-orange { color: var(--orange); } 
+        .mon-red { color: var(--red); }
+        .mon-purple { color: var(--purple); font-weight:bold;}
+
         .enter-btn { border: 1px solid var(--red); color: var(--red); background: rgba(255, 50, 50, 0.1); padding: 5px 15px; font-weight: bold; cursor: pointer; min-width: 80px; }
         .enter-btn.cooldown { border: 1px solid var(--gray); color: var(--gray); background: rgba(0,0,0,0.5); cursor: not-allowed; font-size: 0.7rem; }
         .enter-btn.instance { border: 1px solid var(--purple); color: var(--purple); background: rgba(191, 0, 255, 0.1); }
@@ -136,9 +138,10 @@
         .btn-small { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; margin-left: 5px;}
         .btn-small.equip { border-color: var(--purple); color: var(--purple); text-shadow: 0 0 5px var(--purple); }
 
-        #sys-modal, #reward-modal, #penalty-modal { position: absolute; top: 150px; left: 5%; width: 90%; background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); box-shadow: 0 0 30px var(--blue); z-index: 2000; display: none; flex-direction: column; padding: 20px; text-align: center; animation: sys-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #sys-modal, #reward-modal, #penalty-modal, #dungeon-confirm-modal { position: absolute; top: 100px; left: 5%; width: 90%; background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); box-shadow: 0 0 30px var(--blue); z-index: 2000; display: none; flex-direction: column; padding: 20px; text-align: center; animation: sys-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         #penalty-modal { border-color: var(--red); box-shadow: 0 0 30px var(--red); top: 50px; }
         #reward-modal { border-color: var(--blue); box-shadow: 0 0 30px var(--blue); } 
+        
         .reward-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .reward-box-item { border: 1px solid #fff; padding: 10px; color: #fff; font-size: 0.8rem; font-weight: bold; } 
         
@@ -153,6 +156,29 @@
         #notification { position: fixed; top: 20px; width: 80%; left: 10%; background: var(--blue); color: #000; padding: 10px; text-align: center; font-weight: bold; z-index: 3000; display: none; box-shadow: 0 0 20px var(--blue); animation: system-fade 0.2s; }
         #notification.positive { background: var(--green); color: #000; box-shadow: 0 0 20px var(--green); }
         #notification.negative { background: var(--red); color: #fff; box-shadow: 0 0 20px var(--red); }
+
+        /* DUNGEON CONFIRMATION STYLES */
+        .boss-img-container {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border: 2px solid var(--blue);
+            box-shadow: 0 0 10px var(--blue);
+            margin-bottom: 15px;
+            background: #000;
+        }
+        .boss-img { width: 100%; height: 100%; object-fit: cover; }
+        .dg-name-display { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .dg-timer { font-size: 3rem; color: #fff; font-weight: 700; margin: 10px 0; text-shadow: 0 0 10px var(--red); }
+        .confirm-btn-group { display: flex; gap: 15px; justify-content: center; width: 100%; }
+        .btn-accept { background: var(--blue); color: #000; font-weight: bold; border: none; padding: 12px 25px; cursor: pointer; width: 45%; }
+        .btn-decline { background: transparent; color: #fff; font-weight: bold; border: 1px solid #555; padding: 12px 25px; cursor: pointer; width: 45%; }
+        
+        /* Cores de Texto Dificuldade */
+        .text-white { color: var(--white); text-shadow: 0 0 5px var(--white); }
+        .text-orange { color: var(--orange); text-shadow: 0 0 5px var(--orange); }
+        .text-red { color: var(--red); text-shadow: 0 0 5px var(--red); }
+        .text-purple { color: var(--purple); text-shadow: 0 0 5px var(--purple); }
     </style>
 </head>
 <body id="b">
@@ -174,6 +200,21 @@
     <div class="layout-wrapper">
         <div class="main-frame">
             
+            <div id="dungeon-confirm-modal">
+                <div class="boss-img-container">
+                    <img id="dg-confirm-img" class="boss-img" src="" alt="Boss">
+                </div>
+                <div style="color:#888; font-size:0.8rem; margin-bottom:5px;">BOSS ENCOUNTER</div>
+                <div id="dg-confirm-name" class="dg-name-display">BOSS NAME</div>
+                
+                <div id="dg-confirm-timer" class="dg-timer">10.00</div>
+                
+                <div class="confirm-btn-group">
+                    <button class="btn-accept" onclick="game.confirmEntry()">ACCEPT</button>
+                    <button class="btn-decline" onclick="game.cancelEntry()">DECLINE</button>
+                </div>
+            </div>
+
             <div id="penalty-modal">
                 <h2 style="color:var(--red); font-size:1.5rem;">PENALTY QUEST</h2>
                 <p style="color:#fff; margin:15px 0;">You failed to complete the daily quest.</p>
@@ -331,27 +372,82 @@
             "Demon Soul": { type: 'misc', price: 2000 }
         };
 
+        // NOTA: Para usar suas próprias imagens, coloque-as em uma pasta 'img'
+        // Exemplo: 'img/goblin.jpg', 'img/kasaka.jpg'
+        // Estou usando links de placeholder para demonstração.
         const dungeonData = [
             // CITY GATES
-            { zone: "city", name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", xp: 5, cost: 5, visualTime: 3, cooldownTime: 1 * MIN, minLvl: 1 }, 
-            { zone: "city", name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", xp: 15, cost: 10, visualTime: 5, cooldownTime: 5 * MIN, minLvl: 5 }, 
-            { zone: "city", name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", xp: 40, cost: 20, visualTime: 8, cooldownTime: 15 * MIN, minLvl: 15 }, 
-            { zone: "city", name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", xp: 80, cost: 30, visualTime: 10, cooldownTime: 30 * MIN, minLvl: 25 }, 
-            { zone: "city", name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", xp: 150, cost: 50, visualTime: 15, cooldownTime: 1 * HOUR, minLvl: 35 }, 
+            { 
+                zone: "city", name: "E-Rank Gate", mob: "Goblin", diff: "white", 
+                img: "img/goblin.jpg", // Certifique-se que existe goblin.jpg na pasta img
+                drop: "Goblin Stone", xp: 5, cost: 5, visualTime: 3, cooldownTime: 1 * MIN, minLvl: 1 
+            }, 
+            { 
+                zone: "city", name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", 
+                img: "img/lycan.jpg", // Nome da imagem do lobo
+                drop: "Lycan Fang", xp: 15, cost: 10, visualTime: 5, cooldownTime: 5 * MIN, minLvl: 5 
+            }, 
+            { 
+                zone: "city", name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", 
+                img: "img/centipede.jpg", // Nome da imagem da centopeia
+                drop: "Centipede Shell", xp: 40, cost: 20, visualTime: 8, cooldownTime: 15 * MIN, minLvl: 15 
+            }, 
+            { 
+                zone: "city", name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", 
+                img: "img/icebear.jpg", // Nome da imagem do urso
+                drop: "Ice Crystal", xp: 80, cost: 30, visualTime: 10, cooldownTime: 30 * MIN, minLvl: 25 
+            }, 
+            { 
+                zone: "city", name: "A-Rank Gate", mob: "High Orc", diff: "red", 
+                img: "img/highorc.jpg", // Nome da imagem do orc
+                drop: "Orc Tusk", xp: 150, cost: 50, visualTime: 15, cooldownTime: 1 * HOUR, minLvl: 35 
+            }, 
             
             // INSTANT DUNGEONS (Iconic)
-            { zone: "instance", name: "Hapjeong Subway", mob: "Blue Venom-Fang Kasaka", diff: "purple", drop: "Kasaka's Venom Fang", xp: 600, cost: 40, visualTime: 15, cooldownTime: 0, minLvl: 1, isInstance: true },
-            { zone: "instance", name: "Double Dungeon", mob: "Statue of God", diff: "purple", drop: "Cursed Box", xp: 0, cost: 90, visualTime: 20, cooldownTime: 24 * HOUR, minLvl: 10 },
-            { zone: "instance", name: "Job Change Quest", mob: "Blood-Red Igris", diff: "red", drop: "Knight Killer", xp: 2000, cost: 60, visualTime: 25, cooldownTime: 6 * HOUR, minLvl: 40 },
+            { 
+                zone: "instance", name: "Hapjeong Subway", mob: "Blue Venom-Fang Kasaka", diff: "purple", 
+                img: "img/kasaka.jpg", // Imagem da cobra azul
+                drop: "Kasaka's Venom Fang", xp: 600, cost: 40, visualTime: 15, cooldownTime: 0, minLvl: 1, isInstance: true 
+            },
+            { 
+                zone: "instance", name: "Double Dungeon", mob: "Statue of God", diff: "purple", 
+                img: "img/statue.jpg", // Imagem da Estatua de Deus (Sorriso)
+                drop: "Cursed Box", xp: 0, cost: 90, visualTime: 20, cooldownTime: 24 * HOUR, minLvl: 10 
+            },
+            { 
+                zone: "instance", name: "Job Change Quest", mob: "Blood-Red Igris", diff: "red", 
+                img: "img/igris.jpg", // Imagem do Igris
+                drop: "Knight Killer", xp: 2000, cost: 60, visualTime: 25, cooldownTime: 6 * HOUR, minLvl: 40 
+            },
 
             // DEMON CASTLE
-            { zone: "demon", name: "Lower Floors", mob: "Mean Soul", diff: "orange", drop: "Demon Soul", xp: 300, cost: 30, visualTime: 10, cooldownTime: 1 * HOUR, minLvl: 50 },
-            { zone: "demon", name: "Upper Floors", mob: "Vulcan of the Covetous", diff: "red", drop: "Orb of Avarice", xp: 1000, cost: 50, visualTime: 20, cooldownTime: 4 * HOUR, minLvl: 60 },
-            { zone: "demon", name: "Top Floor", mob: "Demon King Baran", diff: "purple", drop: "Demon King's Dagger", xp: 5000, cost: 80, visualTime: 30, cooldownTime: 12 * HOUR, minLvl: 75 },
+            { 
+                zone: "demon", name: "Lower Floors", mob: "Mean Soul", diff: "orange", 
+                img: "img/demonsoul.jpg", // Imagem de demônio genérico
+                drop: "Demon Soul", xp: 300, cost: 30, visualTime: 10, cooldownTime: 1 * HOUR, minLvl: 50 
+            },
+            { 
+                zone: "demon", name: "Upper Floors", mob: "Vulcan of the Covetous", diff: "red", 
+                img: "img/vulcan.jpg", // Imagem do Vulcan (Gordo verde)
+                drop: "Orb of Avarice", xp: 1000, cost: 50, visualTime: 20, cooldownTime: 4 * HOUR, minLvl: 60 
+            },
+            { 
+                zone: "demon", name: "Top Floor", mob: "Demon King Baran", diff: "purple", 
+                img: "img/baran.jpg", // Imagem do Baran (Dragão Wyvern)
+                drop: "Demon King's Dagger", xp: 5000, cost: 80, visualTime: 30, cooldownTime: 12 * HOUR, minLvl: 75 
+            },
 
             // JEJU ISLAND
-            { zone: "jeju", name: "Outer Island", mob: "Giant Ant", diff: "red", drop: "Ant Wing", xp: 500, cost: 40, visualTime: 15, cooldownTime: 2 * HOUR, minLvl: 60 },
-            { zone: "jeju", name: "Ant Tunnel", mob: "Ant King Beru", diff: "purple", drop: "Black Heart (Core)", xp: 10000, cost: 100, visualTime: 40, cooldownTime: 48 * HOUR, minLvl: 80 }
+            { 
+                zone: "jeju", name: "Outer Island", mob: "Giant Ant", diff: "red", 
+                img: "img/giantant.jpg", // Formiga normal
+                drop: "Ant Wing", xp: 500, cost: 40, visualTime: 15, cooldownTime: 2 * HOUR, minLvl: 60 
+            },
+            { 
+                zone: "jeju", name: "Ant Tunnel", mob: "Ant King Beru", diff: "purple", 
+                img: "img/beru.jpg", // Imagem do Beru
+                drop: "Black Heart (Core)", xp: 10000, cost: 100, visualTime: 40, cooldownTime: 48 * HOUR, minLvl: 80 
+            }
         ];
 
         const skillsData = {
@@ -363,6 +459,8 @@
 
         let missionTimer = null; 
         let pendingRewards = null;
+        let confirmTimer = null;
+        let pendingDungeonIdx = null; // Store index for confirmation
 
         function msToTime(duration) {
             let seconds = Math.floor((duration / 1000) % 60);
@@ -393,7 +491,7 @@
                 currentZone: 'city'
             },
             init() {
-                const s = localStorage.getItem('solo_v49');
+                const s = localStorage.getItem('solo_v50');
                 if(s) {
                     const parsed = JSON.parse(s);
                     this.data = {...this.data, ...parsed};
@@ -405,31 +503,17 @@
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v49', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v50', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v49'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v50'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             getMaxXP(lvl) { return lvl * 100; },
             
             getRank(l) { 
-                if(l<=10) return 'E'; 
-                if(l<=20) return 'D'; 
-                if(l<=40) return 'C'; 
-                if(l<=60) return 'B'; 
-                if(l<=80) return 'A'; 
-                return 'S'; 
+                if(l<=10) return 'E'; if(l<=20) return 'D'; if(l<=40) return 'C'; if(l<=60) return 'B'; if(l<=80) return 'A'; return 'S'; 
             },
-            getJobKey(l) { 
-                if(l < 40) return 'j0'; 
-                if(l < 100) return 'j1'; 
-                return 'j2'; 
-            },
-            getTitleKey(l) { 
-                if(l < 10) return 't0'; 
-                if(l < 30) return 't1'; 
-                if(l < 60) return 't2'; 
-                return 't3'; 
-            },
+            getJobKey(l) { if(l < 40) return 'j0'; if(l < 100) return 'j1'; return 'j2'; },
+            getTitleKey(l) { if(l < 10) return 't0'; if(l < 30) return 't1'; if(l < 60) return 't2'; return 't3'; },
 
             getTotalStats() {
                 let t = { ...this.data.stats };
@@ -467,16 +551,10 @@
                 ui.notify("SURVIVED PENALTY ZONE", "negative");
             },
 
-            setZone(z) {
-                this.data.currentZone = z;
-                this.save();
-                ui.render();
-            },
+            setZone(z) { this.data.currentZone = z; this.save(); ui.render(); },
 
             tick() {
                 const now = Date.now();
-                
-                // FATIGUE RECOVERY: 1 point every 5 mins
                 if (this.data.fatigue > 0 && (now - (this.data.lastFatigueTick || now)) >= (5 * MIN)) {
                     this.data.fatigue = Math.max(0, this.data.fatigue - 1);
                     this.data.lastFatigueTick = now;
@@ -506,7 +584,6 @@
                 if(this.data.dailyCompleted) return;
                 const allComplete = this.data.quests.every(q => q.current >= q.target);
                 if(!allComplete) { ui.notify("COMPLETE ALL QUESTS"); return; }
-
                 const isHidden = this.data.quests.every(q => q.current >= q.target * 2);
                 pendingRewards = [];
                 pendingRewards.push("Full Recovery");
@@ -526,13 +603,11 @@
                 this.data.pts += 3;
                 this.data.xp += 100;
                 ui.notify("REWARDS ACCEPTED"); 
-                
                 pendingRewards.forEach(r => {
                     if(r === "Random Box") this.data.inventory.push("Random Box");
                     if(r === "Blessed Box") this.data.inventory.push("Blessed Box");
                     if(r.includes("Cursed")) this.data.inventory.push("Cursed Box");
                 });
-
                 this.data.dailyCompleted = true;
                 this.checkLevelUp();
                 this.save();
@@ -561,27 +636,41 @@
                 }
             },
 
+            // --- NOVO SISTEMA DE ENTRADA (VISUAL) ---
             enterDungeon(idx) {
-                // Find actual dungeon from filtered list
+                // Filtra para achar a dungeon correta da lista atual
                 const filtered = dungeonData.filter(d => d.zone === this.data.currentZone);
                 const dg = filtered[idx];
                 
-                // Find global index for cooldown management
+                // Pega o index global
                 const globalIdx = dungeonData.findIndex(d => d.name === dg.name);
-
                 const now = Date.now();
+
+                // Verifica Cooldown antes de abrir o modal
                 if(!dg.isInstance) {
                     const unlockTime = this.data.dungeonCooldowns[globalIdx] || 0;
                     if (now < unlockTime) { ui.notify("DUNGEON LOCKED", "negative"); return; }
                 }
 
+                pendingDungeonIdx = idx; // Guarda qual dungeon foi clicada
+                ui.showDungeonConfirm(dg);
+            },
+
+            // Chamado quando clica em ACCEPT
+            confirmEntry() {
+                ui.stopConfirmTimer();
+                const idx = pendingDungeonIdx;
+                const filtered = dungeonData.filter(d => d.zone === this.data.currentZone);
+                const dg = filtered[idx];
+                const globalIdx = dungeonData.findIndex(d => d.name === dg.name);
+
+                // Lógica de Missão Original
                 const totalStats = this.getTotalStats();
                 const vitBonus = Math.floor(totalStats.VIT * 0.2);
                 let finalCost = dg.cost - vitBonus;
 
                 const useStealth = this.data.activeSkills.includes("Stealth");
                 if(useStealth) finalCost += 20;
-
                 if (finalCost < 1) finalCost = 1;
 
                 if(this.data.fatigue + finalCost > 100) { ui.notify("FATIGUE TOO HIGH!", "negative"); return; }
@@ -630,6 +719,11 @@
                     } else { ui.notify("DEFEAT! ESCAPED SAFELY...", "negative"); }
                     this.save(); ui.render();
                 });
+            },
+
+            cancelEntry() {
+                ui.stopConfirmTimer();
+                ui.notify("DUNGEON ENTRY CANCELED");
             },
 
             buy(n, c) { if(this.data.gold >= c) { this.data.gold -= c; this.data.inventory.push(n); this.save(); ui.render(); ui.notify("BOUGHT: " + n); } else { ui.notify("NOT ENOUGH GOLD", "negative"); } },
@@ -723,6 +817,44 @@
                 document.getElementById('n-' + n).classList.add('active');
             },
 
+            // --- VISUAL DO BOSS ---
+            showDungeonConfirm(dg) {
+                const modal = document.getElementById('dungeon-confirm-modal');
+                const img = document.getElementById('dg-confirm-img');
+                const name = document.getElementById('dg-confirm-name');
+                const timer = document.getElementById('dg-confirm-timer');
+                
+                img.src = dg.img;
+                name.innerText = dg.mob;
+                
+                // Colorize name based on difficulty
+                name.className = 'dg-name-display'; // reset
+                if(dg.diff === 'white') name.classList.add('text-white');
+                else if(dg.diff === 'orange') name.classList.add('text-orange');
+                else if(dg.diff === 'red') name.classList.add('text-red');
+                else if(dg.diff === 'purple') name.classList.add('text-purple');
+
+                modal.style.display = 'flex';
+
+                let timeLeft = 10.0;
+                timer.innerText = "10.00";
+                
+                if (confirmTimer) clearInterval(confirmTimer);
+                confirmTimer = setInterval(() => {
+                    timeLeft -= 0.1;
+                    if(timeLeft <= 0) {
+                        game.cancelEntry(); // Time out treated as decline
+                    } else {
+                        timer.innerText = timeLeft.toFixed(2);
+                    }
+                }, 100);
+            },
+
+            stopConfirmTimer() {
+                if (confirmTimer) clearInterval(confirmTimer);
+                document.getElementById('dungeon-confirm-modal').style.display = 'none';
+            },
+
             showRewardModal(rewards, isHidden) {
                 const list = document.getElementById('reward-list');
                 list.innerHTML = '';
@@ -775,17 +907,13 @@
             updateDungeonButtons() {
                 const now = Date.now();
                 const visibleBtns = document.querySelectorAll('.enter-btn');
-                
-                // Need to match filtered list again
                 const filtered = dungeonData.filter(d => d.zone === game.data.currentZone);
                 
                 visibleBtns.forEach((btn, i) => {
-                    if (i >= filtered.length) return; // Safety check
+                    if (i >= filtered.length) return; 
                     const dg = filtered[i];
-                    
                     if(btn.classList.contains('instance')) { btn.innerText = "ENTER"; return; }
                     
-                    // Find global index
                     const globalIdx = dungeonData.findIndex(d => d.name === dg.name);
                     const unlockTime = game.data.dungeonCooldowns[globalIdx] || 0;
                     
@@ -908,7 +1036,6 @@
                 });
                 this.updateClaimButton();
 
-                // DUNGEONS (FILTERED BY ZONE)
                 const dL = document.getElementById('dungeon-list'); dL.innerHTML = '';
                 const filteredDungeons = dungeonData.filter(d => d.zone === game.data.currentZone);
                 
@@ -916,13 +1043,7 @@
                      dL.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">LOCKED ZONE</div>`;
                 } else {
                     filteredDungeons.forEach((dg, i) => {
-                        // Logic to unlock zones/dungeons could go here, for now all shown if zone selected
-                        // But strictly, instance is special.
-                        const show = !dg.isInstance || (dg.isInstance && (d.instanceUnlocked || dg.minLvl >= 10)); // Simple check
-                        
-                        // Style class
                         const styleClass = dg.isInstance ? 'enter-btn instance' : 'enter-btn';
-                        
                         dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="${styleClass}" onclick="game.enterDungeon(${i})">ENTER</button></div>`;
                     });
                 }
