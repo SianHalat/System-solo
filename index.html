@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V33 - Final</title>
+    <title>SYSTEM V34 - Digital Grid</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -16,19 +16,27 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
         
-        /* --- CONFIGURAÇÃO DO BACKGROUND --- */
+        /* --- PLANO DE FUNDO GRID DIGITAL --- */
         body { 
-            /* IMPORTANTE: 
-               1. Faça upload da sua imagem no GitHub junto com este arquivo.
-               2. Nomeie a imagem como 'background.png' (ou altere o nome abaixo).
-            */
-            background-image: url('bg.png.png');
+            /* Cor de fundo base (Preto Azulado Profundo) */
+            background-color: #02050a;
             
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
+            /* Criação das Linhas do Grid via CSS */
+            background-image: 
+                /* Vinheta (Sombra nos cantos para profundidade) */
+                radial-gradient(circle at 50% 50%, transparent 20%, #02050a 120%),
+                
+                /* Linhas Horizontais (Azul Neon Sutil - 8% de opacidade) */
+                linear-gradient(rgba(0, 234, 255, 0.08) 1px, transparent 1px),
+                
+                /* Linhas Verticais (Azul Neon Sutil - 8% de opacidade) */
+                linear-gradient(90deg, rgba(0, 234, 255, 0.08) 1px, transparent 1px);
+            
+            /* Tamanho dos quadrados do grid (30px x 30px) */
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            
+            /* Fixa o fundo para ele não se mover ao rolar */
             background-attachment: fixed;
-            background-color: var(--bg); /* Cor de segurança */
             
             color: #fff; 
             font-family: 'Chakra Petch', sans-serif; 
@@ -37,8 +45,23 @@
             padding-bottom: 90px; 
         }
 
-        /* O resto do estilo permanece idêntico à V33 */
-        .main-frame { width: 100%; max-width: 500px; border: 2px solid #fff; padding: 25px; background: rgba(2, 8, 20, 0.85); position: relative; box-shadow: var(--glow); margin: 0 auto; padding-top: 20px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        /* MOLDURA PRINCIPAL */
+        .main-frame { 
+            width: 100%; 
+            max-width: 500px; 
+            border: 2px solid #fff; 
+            padding: 25px; 
+            /* Fundo levemente transparente para ver o grid atrás */
+            background: rgba(2, 8, 20, 0.9); 
+            position: relative; 
+            box-shadow: var(--glow); 
+            margin: 0 auto; 
+            padding-top: 20px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        /* O restante do CSS permanece idêntico para manter a fidelidade dos textos/ícones */
         .sys-glow-text { color: #fff !important; text-shadow: var(--sys-text-glow); font-weight: 700; }
         .gold-wrapper { display: inline-flex; align-items: baseline; }
         .gold-num { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-shadow: var(--sys-text-glow); letter-spacing: 1px; margin-right: 4px; }
@@ -106,6 +129,7 @@
     </div>
 
     <div class="main-frame">
+        
         <div id="sys-modal">
             <h3 style="color:#fff; margin-bottom:10px;">YOU DEFEATED THE ENEMY</h3>
             <div id="sys-msg-detail" style="color:#aaa; font-size:0.9rem; margin-bottom:15px;"></div>
@@ -120,8 +144,17 @@
         
         <div class="top-right-stack">
             <div id="ui-kebab"><button class="kebab-btn" onclick="ui.toggleSettings()"></button></div>
-            <div id="ui-gold" class="res-row"><span id="txt-gold-lbl">GOLD:</span> <span class="gold-wrapper"><span id="val-gold" class="gold-num">0</span><span class="gold-icon">G</span></span></div>
-            <div id="ui-pts" class="res-row"><span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="res-val-blue">0</span></div>
+            
+            <div id="ui-gold" class="res-row">
+                <span id="txt-gold-lbl">GOLD:</span> 
+                <span class="gold-wrapper">
+                    <span id="val-gold" class="gold-num">0</span><span class="gold-icon">G</span>
+                </span>
+            </div>
+            
+            <div id="ui-pts" class="res-row">
+                <span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="res-val-blue">0</span>
+            </div>
         </div>
 
         <div id="tab-status" class="content active">
@@ -180,41 +213,135 @@
     </nav>
 
     <script>
-        // O Javascript não mudou desde a última versão
         const trans = {
             en: { status: "STATUS", quests: "DAILY QUESTS", shop: "SHOP", pts: "POINTS:", gold: "GOLD:", settings: "SETTINGS", inv: "INVENTORY", empty: "Empty", use: "USE", sell: "SELL", claim: "[ CLAIM XP ]", q1: "Push-ups", q2: "Sit-ups", q3: "Squats", q4: "10km Run", j0: "NONE", j2: "SHADOW MONARCH", j3: "SOUL SHEPHERD", j4: "TITAN OF TWILIGHT", t0: "NONE", t1: "WOLF ASSASSIN", t2: "ONE WHO OVERCAME ADVERSITY", t3: "DEMON SLAYER" },
             pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", claim: "[ RESGATAR XP ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Correr 10km", j0: "NENHUM", j2: "MONARCA DAS SOMBRAS", j3: "PASTOR DE ALMAS", j4: "TITÃ DO CREPÚSCULO", t0: "NENHUM", t1: "ASSASSINO DE LOBOS", t2: "SUPEROU A ADVERSIDADE", t3: "ASSASSINO DE DEMÔNIOS" }
         };
-        const dungeonData = [{ name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5 }, { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10 }, { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20 }, { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30 }, { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50 }, { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90 }];
+
+        const dungeonData = [
+            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5 },
+            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10 },
+            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20 },
+            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30 },
+            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50 },
+            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90 }
+        ];
+
         const itemPrices = { "Goblin Stone": 10, "Lycan Fang": 25, "Centipede Shell": 50, "Ice Crystal": 100, "Orc Tusk": 250, "Ant Wing": 1000, "Bandage": 15, "Potion": 50, "Return Stone": 100, "E-Rank Dagger": 250 };
+
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
-            init() { const s = localStorage.getItem('solo_v33'); if(s) this.data = JSON.parse(s); ui.render(); setInterval(() => this.tick(), 1000); },
-            save() { localStorage.setItem('solo_v33', JSON.stringify(this.data)); },
+            init() {
+                const s = localStorage.getItem('solo_v34');
+                if(s) this.data = JSON.parse(s);
+                ui.render();
+                setInterval(() => this.tick(), 1000);
+            },
+            save() { localStorage.setItem('solo_v34', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v33'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v34'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
-            tick() { const n = new Date(); const e = new Date(); e.setHours(23,59,59); const d = e - n; const h = Math.floor(d/3600000); const m = Math.floor((d%3600000)/60000); const s = Math.floor((d%60000)/1000); document.getElementById('timer').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; },
+            tick() {
+                const n = new Date(); const e = new Date(); e.setHours(23,59,59);
+                const d = e - n;
+                const h = Math.floor(d/3600000); const m = Math.floor((d%3600000)/60000); const s = Math.floor((d%60000)/1000);
+                document.getElementById('timer').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            },
             toggle(i) { this.data.quests[i].done = !this.data.quests[i].done; this.save(); ui.render(); },
-            claimDailyRewards() { if(this.data.quests.every(q => q.done)) { this.data.xp += 100; this.data.fatigue -= 20; if(this.data.fatigue < 0) this.data.fatigue = 0; if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; ui.notify("LEVEL UP!"); } this.data.quests.forEach(q => q.done = false); this.save(); ui.render(); ui.notify("REWARDS CLAIMED: XP +100"); } },
-            enterDungeon(idx) { const dg = dungeonData[idx]; if(this.data.fatigue + dg.cost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; } const successChance = 0.8; this.data.fatigue += dg.cost; if(Math.random() < successChance) { this.data.xp += dg.xp; this.data.inventory.push(dg.drop); if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; } ui.showSysModal(dg.mob, dg.drop); } else { ui.notify("DEFEAT! ESCAPED SAFELY..."); } this.save(); ui.render(); },
+            claimDailyRewards() {
+                if(this.data.quests.every(q => q.done)) {
+                    this.data.xp += 100; this.data.fatigue -= 20; if(this.data.fatigue < 0) this.data.fatigue = 0;
+                    if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; ui.notify("LEVEL UP!"); }
+                    this.data.quests.forEach(q => q.done = false);
+                    this.save(); ui.render(); ui.notify("REWARDS CLAIMED: XP +100");
+                }
+            },
+            enterDungeon(idx) {
+                const dg = dungeonData[idx];
+                if(this.data.fatigue + dg.cost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; }
+                const successChance = 0.8;
+                this.data.fatigue += dg.cost;
+                if(Math.random() < successChance) {
+                    this.data.xp += dg.xp; this.data.inventory.push(dg.drop);
+                    if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; }
+                    ui.showSysModal(dg.mob, dg.drop);
+                } else { ui.notify("DEFEAT! ESCAPED SAFELY..."); }
+                this.save(); ui.render();
+            },
             buy(n, c) { if(this.data.gold >= c) { this.data.gold -= c; this.data.inventory.push(n); this.save(); ui.render(); ui.notify("BOUGHT: " + n); } else { ui.notify("NOT ENOUGH GOLD"); } },
-            useItem(index) { const item = this.data.inventory[index]; if(item === 'Bandage') { this.data.fatigue -= 10; } else if(item === 'Potion') { this.data.fatigue -= 40; } else { ui.notify("CANNOT USE."); return; } if(this.data.fatigue < 0) this.data.fatigue = 0; this.data.inventory.splice(index, 1); this.save(); ui.render(); },
-            sellItem(index) { const item = this.data.inventory[index]; const price = itemPrices[item] || 0; this.data.gold += price; this.data.inventory.splice(index, 1); this.save(); ui.render(); ui.notify(`SOLD: +${price}G`); },
+            useItem(index) {
+                const item = this.data.inventory[index];
+                if(item === 'Bandage') { this.data.fatigue -= 10; }
+                else if(item === 'Potion') { this.data.fatigue -= 40; }
+                else { ui.notify("CANNOT USE."); return; }
+                if(this.data.fatigue < 0) this.data.fatigue = 0;
+                this.data.inventory.splice(index, 1); this.save(); ui.render();
+            },
+            sellItem(index) {
+                const item = this.data.inventory[index];
+                const price = itemPrices[item] || 0;
+                this.data.gold += price;
+                this.data.inventory.splice(index, 1);
+                this.save(); ui.render(); ui.notify(`SOLD: +${price}G`);
+            },
             getRank(l) { if(l<=3) return 'E'; if(l<=8) return 'D'; if(l<=19) return 'C'; if(l<=39) return 'B'; if(l<=59) return 'A'; if(l<=69) return 'S'; if(l<=89) return 'SS'; return 'SSS'; },
             getJobKey(l) { if(l < 40) return 'j0'; if(l < 80) return 'j2'; if(l < 100) return 'j3'; return 'j4'; },
             getTitleKey(l) { if(l < 15) return 't0'; if(l < 40) return 't1'; if(l < 60) return 't2'; return 't3'; }
         };
+
         const ui = {
-            tab(n) { const els = { timer: document.getElementById('ui-timer-container'), kebab: document.getElementById('ui-kebab'), gold: document.getElementById('ui-gold'), pts: document.getElementById('ui-pts') }; if (n === 'status') { els.timer.style.opacity = '1'; els.kebab.style.display = 'flex'; els.gold.style.display = 'flex'; els.pts.style.display = 'flex'; } else if (n === 'shop') { els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.gold.style.display = 'flex'; els.pts.style.display = 'none'; } else { els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.gold.style.display = 'none'; els.pts.style.display = 'none'; } document.querySelectorAll('.content').forEach(c => c.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); document.getElementById('tab-' + n).classList.add('active'); document.getElementById('n-' + n).classList.add('active'); },
+            tab(n) {
+                const els = { timer: document.getElementById('ui-timer-container'), kebab: document.getElementById('ui-kebab'), gold: document.getElementById('ui-gold'), pts: document.getElementById('ui-pts') };
+                if (n === 'status') { els.timer.style.opacity = '1'; els.kebab.style.display = 'flex'; els.gold.style.display = 'flex'; els.pts.style.display = 'flex'; }
+                else if (n === 'shop') { els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.gold.style.display = 'flex'; els.pts.style.display = 'none'; }
+                else { els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.gold.style.display = 'none'; els.pts.style.display = 'none'; }
+                document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('tab-' + n).classList.add('active');
+                document.getElementById('n-' + n).classList.add('active');
+            },
             toggleSettings() { document.getElementById('m').style.display = (document.getElementById('m').style.display === 'flex') ? 'none' : 'flex'; },
             notify(m) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; setTimeout(() => n.style.display = 'none', 2000); },
-            showSysModal(mob, item) { document.getElementById('sys-msg-detail').innerText = `You have slain the ${mob}.`; document.getElementById('sys-item-name').innerText = item; document.getElementById('sys-modal').style.display = 'flex'; },
+            showSysModal(mob, item) {
+                document.getElementById('sys-msg-detail').innerText = `You have slain the ${mob}.`;
+                document.getElementById('sys-item-name').innerText = item;
+                document.getElementById('sys-modal').style.display = 'flex';
+            },
             render() {
-                const d = game.data; const t = trans[d.lang]; document.getElementById('txt-status').innerText = t.status; document.getElementById('txt-quests').innerText = t.quests; document.getElementById('txt-shop').innerText = t.shop; document.getElementById('txt-inv').innerText = t.inv; document.getElementById('n-status').innerText = t.status; document.getElementById('n-quests').innerText = t.quests; document.getElementById('n-dungeon').innerText = "DUNGEON"; document.getElementById('n-shop').innerText = t.shop; document.getElementById('val-lvl').innerText = d.lvl; document.getElementById('val-pts').innerText = d.pts; document.getElementById('val-gold').innerText = d.gold; document.getElementById('val-fatigue-num').innerText = d.fatigue; document.getElementById('xp-bar').style.width = d.xp + "%"; document.getElementById('fatigue-bar').style.width = d.fatigue + "%"; document.getElementById('val-rank').innerText = game.getRank(d.lvl); document.getElementById('val-job').innerText = t[game.getJobKey(d.lvl)]; document.getElementById('val-title').innerText = t[game.getTitleKey(d.lvl)]; for(let k in d.stats) document.getElementById('val-'+k).innerText = d.stats[k];
-                const qL = document.getElementById('q-list'); qL.innerHTML = ''; d.quests.forEach((q, i) => { qL.innerHTML += `<div class="quest-item"><div><span style="${q.done?'text-decoration:line-through;color:#444':''}">${t[q.id]}</span></div><input type="checkbox" onchange="game.toggle(${i})" ${q.done?'checked':''}></div>`; });
-                const dL = document.getElementById('dungeon-list'); dL.innerHTML = ''; dungeonData.forEach((dg, i) => { dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="enter-btn" onclick="game.enterDungeon(${i})">ENTER</button></div>`; });
-                const iL = document.getElementById('inv-list'); if(d.inventory.length === 0) iL.innerHTML = `<div style="color:#444;text-align:center;">${t.empty}</div>`; else iL.innerHTML = d.inventory.map((item, index) => `<div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;text-shadow:0 0 5px var(--blue);">${t.sell}</button></div></div>`).join('');
+                const d = game.data; const t = trans[d.lang];
+                document.getElementById('txt-status').innerText = t.status;
+                document.getElementById('txt-quests').innerText = t.quests;
+                document.getElementById('txt-shop').innerText = t.shop;
+                document.getElementById('txt-inv').innerText = t.inv;
+                document.getElementById('n-status').innerText = t.status;
+                document.getElementById('n-quests').innerText = t.quests;
+                document.getElementById('n-dungeon').innerText = "DUNGEON";
+                document.getElementById('n-shop').innerText = t.shop;
+                document.getElementById('val-lvl').innerText = d.lvl;
+                document.getElementById('val-pts').innerText = d.pts;
+                document.getElementById('val-gold').innerText = d.gold;
+                document.getElementById('val-fatigue-num').innerText = d.fatigue;
+                document.getElementById('xp-bar').style.width = d.xp + "%";
+                document.getElementById('fatigue-bar').style.width = d.fatigue + "%";
+                document.getElementById('val-rank').innerText = game.getRank(d.lvl);
+                document.getElementById('val-job').innerText = t[game.getJobKey(d.lvl)];
+                document.getElementById('val-title').innerText = t[game.getTitleKey(d.lvl)];
+                for(let k in d.stats) document.getElementById('val-'+k).innerText = d.stats[k];
+                
+                const qL = document.getElementById('q-list'); qL.innerHTML = '';
+                d.quests.forEach((q, i) => {
+                    qL.innerHTML += `<div class="quest-item"><div><span style="${q.done?'text-decoration:line-through;color:#444':''}">${t[q.id]}</span></div><input type="checkbox" onchange="game.toggle(${i})" ${q.done?'checked':''}></div>`;
+                });
+
+                const dL = document.getElementById('dungeon-list'); dL.innerHTML = '';
+                dungeonData.forEach((dg, i) => {
+                    dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="enter-btn" onclick="game.enterDungeon(${i})">ENTER</button></div>`;
+                });
+
+                const iL = document.getElementById('inv-list');
+                if(d.inventory.length === 0) iL.innerHTML = `<div style="color:#444;text-align:center;">${t.empty}</div>`;
+                else iL.innerHTML = d.inventory.map((item, index) => `
+                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;text-shadow:0 0 5px var(--blue);">${t.sell}</button></div></div>`).join('');
             }
         };
         game.init();
