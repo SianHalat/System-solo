@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V39 - Immersive</title>
+    <title>SYSTEM V41 - Cooldowns</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -11,6 +11,7 @@
             --glow: 0 0 10px #00eaff; 
             --bg: #02050a; 
             --red: #ff3333; 
+            --gray: #444;
             --sys-text-glow: 0 0 8px var(--blue);
         }
 
@@ -18,7 +19,6 @@
         
         body { 
             background-color: #02050a;
-            /* Grid Digital */
             background-image: 
                 radial-gradient(circle at 50% 50%, transparent 20%, #02050a 120%),
                 linear-gradient(rgba(0, 234, 255, 0.08) 1px, transparent 1px),
@@ -45,39 +45,21 @@
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
 
-        /* --- RELÓGIO CIRCULAR PURO (SEM NÚMEROS) --- */
+        /* --- TIMER DIGITAL DE MISSÃO --- */
         #ui-timer-container { 
             position: absolute; 
-            top: 20px; 
-            left: 20px; 
+            top: 25px; 
+            left: 25px; 
             z-index: 50; 
-            width: 50px; 
-            height: 50px;
-            display: none; /* Controlado via JS */
+            display: none; 
         }
-
-        .circular-chart {
-            display: block;
-            margin: 0 auto;
-            max-width: 100%;
-            max-height: 100%;
-            /* Rotaciona para começar do topo (12h) */
-            transform: rotate(-90deg); 
-        }
-
-        .circle-bg {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.05);
-            stroke-width: 4;
-        }
-
-        .circle {
-            fill: none;
-            stroke-width: 4; /* Espessura do anel */
-            stroke-linecap: round; /* Bordas arredondadas */
-            stroke: var(--blue);
-            filter: drop-shadow(0 0 8px var(--blue)); /* Glow intenso */
-            transition: stroke-dasharray 1s linear;
+        
+        .mission-timer-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: var(--sys-text-glow);
+            letter-spacing: 2px;
         }
 
         /* --- INTERFACE DIREITA --- */
@@ -93,13 +75,7 @@
         .sys-num-unified { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 1.2rem; text-shadow: var(--sys-text-glow); letter-spacing: 1px; }
 
         /* --- CAIXA DE GOLD --- */
-        #gold-container-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end; 
-            margin-top: 8px; 
-            display: none; 
-        }
+        #gold-container-wrapper { width: 100%; display: none; justify-content: flex-end; margin-top: 8px; }
         .gold-box-frame {
             border: 2px solid #fff; background: rgba(2, 8, 20, 0.9); backdrop-filter: blur(4px); box-shadow: var(--glow); padding: 5px 20px; display: flex; align-items: center; gap: 15px; position: relative;
         }
@@ -136,7 +112,14 @@
         .mon-white { color: #fff; text-shadow: 0 0 5px #fff; }
         .mon-orange { color: #FFA500; text-shadow: 0 0 5px #FFA500; } 
         .mon-red { color: var(--red); text-shadow: 0 0 5px var(--red); }
-        .enter-btn { border: 1px solid var(--red); color: var(--red); background: rgba(255, 50, 50, 0.1); padding: 5px 15px; font-weight: bold; cursor: pointer; }
+        
+        /* BOTÕES DE ENTRADA E CLAIM - ESTADOS */
+        .enter-btn { border: 1px solid var(--red); color: var(--red); background: rgba(255, 50, 50, 0.1); padding: 5px 15px; font-weight: bold; cursor: pointer; min-width: 80px; }
+        .enter-btn.cooldown { border: 1px solid var(--gray); color: var(--gray); background: rgba(0,0,0,0.5); cursor: not-allowed; font-size: 0.7rem; }
+        
+        .claim-btn { width:100%; padding:15px; margin-top:20px; border:1px solid var(--blue); color:var(--blue); background:rgba(0,234,255,0.1); font-weight:bold; cursor:pointer; }
+        .claim-btn.disabled { border:1px solid var(--gray); color:var(--gray); background:transparent; cursor:not-allowed; }
+
         #sys-modal { position: absolute; top: 150px; left: 5%; width: 90%; background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); box-shadow: 0 0 30px var(--blue); z-index: 2000; display: none; flex-direction: column; padding: 20px; text-align: center; animation: sys-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
         .shop-item { border: 1px solid var(--blue); padding: 12px; text-align: center; background: rgba(0,0,0,0.6); cursor: pointer; }
@@ -179,19 +162,7 @@
             </div>
 
             <div id="ui-timer-container">
-                <svg viewBox="0 0 36 36" class="circular-chart">
-                    <path class="circle-bg"
-                        d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path class="circle" id="timer-path"
-                        stroke-dasharray="100, 100"
-                        d="M18 2.0845
-                            a 15.9155 15.9155 0 0 1 0 31.831
-                            a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                </svg>
+                <div id="mission-timer-text" class="mission-timer-text">TIME: 00:00:00</div>
             </div>
             
             <div class="top-right-stack">
@@ -227,7 +198,7 @@
             <div id="tab-quests" class="content">
                 <h2 id="txt-quests" class="tab-title">DAILY QUESTS</h2>
                 <div id="q-list"></div>
-                <button id="btn-claim" onclick="game.claimDailyRewards()" style="width:100%; padding:15px; margin-top:20px; border:1px solid var(--blue); color:var(--blue); background:rgba(0,234,255,0.1); font-weight:bold; cursor:pointer;">CLAIM XP</button>
+                <button id="btn-claim" class="claim-btn" onclick="game.claimDailyRewards()">CLAIM XP</button>
             </div>
 
             <div id="tab-dungeon" class="content">
@@ -273,44 +244,127 @@
             pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", claim: "[ RESGATAR XP ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Correr 10km", j0: "NENHUM", j2: "MONARCA DAS SOMBRAS", j3: "PASTOR DE ALMAS", j4: "TITÃ DO CREPÚSCULO", t0: "NENHUM", t1: "ASSASSINO DE LOBOS", t2: "SUPEROU A ADVERSIDADE", t3: "ASSASSINO DE DEMÔNIOS" }
         };
 
+        // Cooldown em Milissegundos (ms)
+        const MIN = 60000;
+        const HOUR = 3600000;
+        
         const dungeonData = [
-            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, timeLimit: 300 }, 
-            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, timeLimit: 600 }, 
-            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, timeLimit: 900 }, 
-            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, timeLimit: 1200 }, 
-            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, timeLimit: 1800 }, 
-            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, timeLimit: 3600 } 
+            // visualTime: Tempo da batalha (segundos)
+            // cooldownTime: Tempo para resetar (ms)
+            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, visualTime: 3, cooldownTime: 5 * MIN }, 
+            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, visualTime: 5, cooldownTime: 15 * MIN }, 
+            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, visualTime: 8, cooldownTime: 30 * MIN }, 
+            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, visualTime: 10, cooldownTime: 1 * HOUR }, 
+            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, visualTime: 15, cooldownTime: 4 * HOUR }, 
+            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, visualTime: 20, cooldownTime: 12 * HOUR } 
         ];
 
         const itemPrices = { "Goblin Stone": 10, "Lycan Fang": 25, "Centipede Shell": 50, "Ice Crystal": 100, "Orc Tusk": 250, "Ant Wing": 1000, "Bandage": 15, "Potion": 50, "Return Stone": 100, "E-Rank Dagger": 250 };
 
         let missionTimer = null; 
 
+        // Função auxiliar para formatar ms em HH:MM:SS
+        function msToTime(duration) {
+            let seconds = Math.floor((duration / 1000) % 60);
+            let minutes = Math.floor((duration / (1000 * 60)) % 60);
+            let hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+            return (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+        }
+
         const game = {
-            data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
-            init() {
-                const s = localStorage.getItem('solo_v39');
-                if(s) this.data = JSON.parse(s);
-                ui.tab('status'); // CORREÇÃO DE BUG: Força o Status (e o Gold) a aparecer na inicialização
-                ui.render();
+            data: { 
+                stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, 
+                pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', 
+                inventory: [], 
+                quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}],
+                dungeonCooldowns: [], // Armazena timestamp de quando a dungeon libera
+                dailyReset: null // Timestamp de quando a daily libera
             },
-            save() { localStorage.setItem('solo_v39', JSON.stringify(this.data)); },
+            init() {
+                const s = localStorage.getItem('solo_v41');
+                if(s) {
+                    const parsed = JSON.parse(s);
+                    this.data = {...this.data, ...parsed}; // Merge seguro
+                    // Garante arrays
+                    if(!this.data.dungeonCooldowns) this.data.dungeonCooldowns = [];
+                }
+                ui.tab('status'); 
+                ui.render();
+                setInterval(() => this.tick(), 1000); // Game Loop Principal
+            },
+            save() { localStorage.setItem('solo_v41', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v39'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v41'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             
-            toggle(i) { this.data.quests[i].done = !this.data.quests[i].done; this.save(); ui.render(); },
-            claimDailyRewards() {
-                if(this.data.quests.every(q => q.done)) {
-                    this.data.xp += 100; this.data.fatigue -= 20; if(this.data.fatigue < 0) this.data.fatigue = 0;
-                    if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; ui.notify("LEVEL UP!"); }
+            // Loop de Verificação (Roda a cada 1s)
+            tick() {
+                const now = Date.now();
+                
+                // Verifica Daily Reset
+                if (this.data.dailyReset && now >= this.data.dailyReset) {
+                    this.data.dailyReset = null;
                     this.data.quests.forEach(q => q.done = false);
-                    this.save(); ui.render(); ui.notify("REWARDS CLAIMED: XP +100");
+                    ui.notify("DAILY QUESTS RESET");
+                    this.save();
+                    ui.render();
+                }
+
+                // Atualiza UI de botões de Dungeon (se estiver na aba)
+                if(document.getElementById('tab-dungeon').classList.contains('active')) {
+                    ui.updateDungeonButtons();
+                }
+
+                // Atualiza botão de Claim (se estiver na aba)
+                if(document.getElementById('tab-quests').classList.contains('active')) {
+                    ui.updateClaimButton();
+                }
+            },
+
+            // --- DAILY QUESTS ---
+            toggle(i) { 
+                if (this.data.dailyReset) return; // Bloqueado se já completou hoje
+
+                const q = this.data.quests[i];
+                if(q.done) {
+                    q.done = false;
+                    this.save();
+                    ui.render();
+                } else {
+                    ui.startMissionTimer(3, () => {
+                        q.done = true;
+                        this.save();
+                        ui.render();
+                        ui.notify("COMPLETED");
+                    });
+                }
+            },
+
+            claimDailyRewards() {
+                if (this.data.dailyReset) return; // Já pegou
+
+                if(this.data.quests.every(q => q.done)) {
+                    this.data.xp += 100; 
+                    this.data.fatigue -= 20; if(this.data.fatigue < 0) this.data.fatigue = 0;
+                    if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; ui.notify("LEVEL UP!"); }
+                    
+                    // Define cooldown de 24h
+                    this.data.dailyReset = Date.now() + (24 * HOUR);
+                    
+                    this.save(); 
+                    ui.render(); 
+                    ui.notify("REWARDS CLAIMED. RESET IN 24H.");
                 }
             },
             
-            // --- LÓGICA DE DUNGEON ---
+            // --- DUNGEON ---
             enterDungeon(idx) {
+                const now = Date.now();
+                const unlockTime = this.data.dungeonCooldowns[idx] || 0;
+                
+                // Verifica Cooldown
+                if (now < unlockTime) { ui.notify("DUNGEON LOCKED"); return; }
+
                 const dg = dungeonData[idx];
                 if(this.data.fatigue + dg.cost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; }
                 
@@ -318,8 +372,10 @@
                 this.save();
                 ui.render();
                 
-                // Inicia o Timer (apenas visual, sem texto)
-                ui.startMissionTimer(dg.timeLimit, () => {
+                ui.startMissionTimer(dg.visualTime, () => {
+                    // Define o Cooldown da Dungeon APÓS terminar a batalha
+                    this.data.dungeonCooldowns[idx] = Date.now() + dg.cooldownTime;
+
                     const successChance = 0.8;
                     ui.stopMissionTimer(); 
                     
@@ -358,19 +414,10 @@
         const ui = {
             tab(n) {
                 const els = { timer: document.getElementById('ui-timer-container'), kebab: document.getElementById('ui-kebab'), pts: document.getElementById('ui-pts'), goldBox: document.getElementById('gold-container-wrapper') };
-                
-                if (n === 'status') { 
-                    els.kebab.style.display = 'flex'; els.pts.style.display = 'flex'; 
-                    els.goldBox.style.display = 'flex'; 
-                }
-                else if (n === 'shop') { 
-                    els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
-                    els.goldBox.style.display = 'flex'; 
-                }
-                else { 
-                    els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
-                    els.goldBox.style.display = 'none'; 
-                }
+                const showResources = (n === 'status' || n === 'shop');
+                els.goldBox.style.display = showResources ? 'flex' : 'none';
+                els.kebab.style.display = (n === 'status') ? 'flex' : 'none';
+                els.pts.style.display = (n === 'status') ? 'flex' : 'none';
 
                 document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -378,38 +425,66 @@
                 document.getElementById('n-' + n).classList.add('active');
             },
 
-            // --- TIMER VISUAL (SEM TEXTO) ---
-            startMissionTimer(seconds, onComplete) {
+            startMissionTimer(durationSeconds, onComplete) {
                 const timerContainer = document.getElementById('ui-timer-container');
-                const timerPath = document.getElementById('timer-path');
-                
+                const timerText = document.getElementById('mission-timer-text');
                 timerContainer.style.display = 'block'; 
-                let elapsed = 0;
-                let simulatedDuration = 3; // Duração visual da "batalha"
+                let remaining = durationSeconds;
+                let m = Math.floor(remaining / 60); let s = Math.floor(remaining % 60);
+                timerText.innerText = `TIME: ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}:00`;
 
                 if (missionTimer) clearInterval(missionTimer);
-
-                // Reseta visual para cheio
-                timerPath.style.strokeDasharray = "100, 100";
-
                 missionTimer = setInterval(() => {
-                    elapsed += 0.05; // Atualização suave
-                    
-                    // Calcula a porcentagem restante (100 -> 0)
-                    const percentage = Math.max(0, (1 - (elapsed / simulatedDuration)) * 100);
-                    timerPath.style.strokeDasharray = `${percentage}, 100`;
-
-                    if (elapsed >= simulatedDuration) {
+                    remaining -= 0.1; 
+                    if (remaining <= 0) {
                         clearInterval(missionTimer);
-                        timerContainer.style.display = 'none'; 
-                        onComplete(); 
+                        timerText.innerText = `TIME: 00:00:00`;
+                        setTimeout(() => { timerContainer.style.display = 'none'; onComplete(); }, 500);
+                        return;
                     }
-                }, 50); 
+                    m = Math.floor(remaining / 60); s = Math.floor(remaining % 60); let ms = Math.floor((remaining % 1) * 100);
+                    timerText.innerText = `TIME: ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}:${ms < 10 ? '0'+ms : ms}`;
+                }, 100); 
             },
 
             stopMissionTimer() {
                 if (missionTimer) clearInterval(missionTimer);
                 document.getElementById('ui-timer-container').style.display = 'none';
+            },
+
+            updateDungeonButtons() {
+                const now = Date.now();
+                const btns = document.querySelectorAll('.enter-btn');
+                btns.forEach((btn, i) => {
+                    const unlockTime = game.data.dungeonCooldowns[i] || 0;
+                    if (now < unlockTime) {
+                        // Está em Cooldown
+                        const diff = unlockTime - now;
+                        btn.innerText = msToTime(diff);
+                        btn.classList.add('cooldown');
+                        btn.disabled = true;
+                    } else {
+                        // Está Disponível
+                        btn.innerText = "ENTER";
+                        btn.classList.remove('cooldown');
+                        btn.disabled = false;
+                    }
+                });
+            },
+
+            updateClaimButton() {
+                const btn = document.getElementById('btn-claim');
+                if (game.data.dailyReset) {
+                    const now = Date.now();
+                    const diff = game.data.dailyReset - now;
+                    if (diff > 0) {
+                        btn.innerText = `NEXT RESET: ${msToTime(diff)}`;
+                        btn.classList.add('disabled');
+                        return;
+                    }
+                }
+                btn.innerText = "[ CLAIM XP ]";
+                btn.classList.remove('disabled');
             },
 
             toggleSettings() { document.getElementById('m').style.display = (document.getElementById('m').style.display === 'flex') ? 'none' : 'flex'; },
@@ -440,20 +515,28 @@
                 document.getElementById('val-title').innerText = t[game.getTitleKey(d.lvl)];
                 for(let k in d.stats) document.getElementById('val-'+k).innerText = d.stats[k];
                 
+                // RENDERIZAR QUESTS
                 const qL = document.getElementById('q-list'); qL.innerHTML = '';
+                const isDailyLocked = !!d.dailyReset;
                 d.quests.forEach((q, i) => {
-                    qL.innerHTML += `<div class="quest-item"><div><span style="${q.done?'text-decoration:line-through;color:#444':''}">${t[q.id]}</span></div><input type="checkbox" onchange="game.toggle(${i})" ${q.done?'checked':''}></div>`;
+                    const checked = q.done ? 'checked' : '';
+                    const disabled = isDailyLocked ? 'disabled' : ''; // Desabilita se já completou tudo
+                    qL.innerHTML += `<div class="quest-item"><div><span style="${q.done?'text-decoration:line-through;color:#444':''}">${t[q.id]}</span></div><input type="checkbox" onclick="game.toggle(${i}); return false;" ${checked} ${disabled}></div>`;
                 });
+                this.updateClaimButton(); // Atualiza botão de claim
 
+                // RENDERIZAR DUNGEONS
                 const dL = document.getElementById('dungeon-list'); dL.innerHTML = '';
                 dungeonData.forEach((dg, i) => {
+                    // O estado do botão é controlado pelo game.tick(), aqui apenas criamos a estrutura
                     dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="enter-btn" onclick="game.enterDungeon(${i})">ENTER</button></div>`;
                 });
+                this.updateDungeonButtons(); // Força update imediato
 
                 const iL = document.getElementById('inv-list');
                 if(d.inventory.length === 0) iL.innerHTML = `<div style="color:#444;text-align:center;">${t.empty}</div>`;
                 else iL.innerHTML = d.inventory.map((item, index) => `
-                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;text-shadow:0 0 5px var(--blue);">${t.sell}</button></div></div>`).join('');
+                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 8px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 8px;font-size:0.7rem;text-shadow:0 0 5px var(--blue);">${t.sell}</button></div></div>`).join('');
             }
         };
         game.init();
