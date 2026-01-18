@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V37 - Final Fix</title>
+    <title>SYSTEM V38 - Circular Timer</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -16,7 +16,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
         
-        /* --- PLANO DE FUNDO GRID DIGITAL --- */
         body { 
             background-color: #02050a;
             background-image: 
@@ -35,68 +34,65 @@
             align-items: center;
         }
 
-        /* CONTAINER CENTRAL */
-        .layout-wrapper {
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-        }
+        .layout-wrapper { width: 100%; max-width: 500px; position: relative; }
 
-        /* MOLDURA PRINCIPAL */
         .main-frame { 
-            width: 100%; 
-            border: 2px solid #fff; 
-            padding: 25px; 
-            background: rgba(2, 8, 20, 0.9); 
-            position: relative; 
-            box-shadow: var(--glow); 
-            padding-top: 20px;
-            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-            z-index: 10;
+            width: 100%; border: 2px solid #fff; padding: 25px; 
+            background: rgba(2, 8, 20, 0.9); position: relative; box-shadow: var(--glow); 
+            padding-top: 20px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 10;
         }
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
 
-        /* --- CAIXA DE GOLD (ABAIXO DO STATUS) --- */
-        #gold-container-wrapper {
-            width: 100%;
-            display: flex; /* Flex para alinhar, mas controlado pelo JS para aparecer/sumir */
-            justify-content: flex-end; 
-            margin-top: 8px; 
-            /* Importante: Mantemos display flex aqui no CSS base ou none? 
-               Vamos deixar o JS controlar isso para evitar piscar na tela errada.
-               Começa oculto e o JS ativa no init() */
-            display: none; 
-        }
-
-        .gold-box-frame {
-            border: 2px solid #fff;
-            background: rgba(2, 8, 20, 0.9);
-            backdrop-filter: blur(4px);
-            box-shadow: var(--glow);
-            padding: 5px 20px; 
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-        }
-        .gold-box-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 6px; height: 6px; border-top: 2px solid #fff; border-left: 2px solid #fff; }
-        .gold-box-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 6px; height: 6px; border-bottom: 2px solid #fff; border-right: 2px solid #fff; }
-
-
-        /* UI TOPO */
-        #ui-timer-container { position: absolute; top: 25px; left: 25px; z-index: 50; transition: opacity 0.3s ease; }
-        .timer { font-size: 1rem; font-weight: bold; color: #fff; text-shadow: var(--sys-text-glow); }
-
-        .top-right-stack { 
+        /* --- NOVO RELÓGIO CIRCULAR SVG --- */
+        #ui-timer-container { 
             position: absolute; 
-            top: 30px; 
-            right: 25px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: flex-end; 
-            gap: 10px; 
+            top: 20px; 
+            left: 20px; 
             z-index: 50; 
+            width: 60px; 
+            height: 60px;
+            display: none; /* Começa oculto */
+        }
+
+        .circular-chart {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 3.8;
+        }
+
+        .circle {
+            fill: none;
+            stroke-width: 2.8;
+            stroke-linecap: round;
+            stroke: var(--blue);
+            filter: drop-shadow(0 0 5px var(--blue));
+            /* Animação controlada via JS */
+            transition: stroke-dasharray 1s linear;
+        }
+
+        .timer-text-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 5px var(--blue);
+        }
+
+        /* --- INTERFACE DIREITA --- */
+        .top-right-stack { 
+            position: absolute; top: 30px; right: 25px; 
+            display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 50; 
         }
 
         .kebab-btn { width: 20px; height: 20px; position: relative; background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -105,16 +101,29 @@
         .res-row { font-size: 0.8rem; color: #8899aa; display: flex; gap: 10px; align-items: center; justify-content: flex-end; height: 24px; }
         .sys-num-unified { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 1.2rem; text-shadow: var(--sys-text-glow); letter-spacing: 1px; }
 
+        /* --- CAIXA DE GOLD --- */
+        #gold-container-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end; 
+            margin-top: 8px; 
+            /* Importante: Começa visível aqui, mas o JS vai gerenciar as abas */
+            display: none; 
+        }
+        .gold-box-frame {
+            border: 2px solid #fff; background: rgba(2, 8, 20, 0.9); backdrop-filter: blur(4px); box-shadow: var(--glow); padding: 5px 20px; display: flex; align-items: center; gap: 15px; position: relative;
+        }
+        .gold-box-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 6px; height: 6px; border-top: 2px solid #fff; border-left: 2px solid #fff; }
+        .gold-box-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 6px; height: 6px; border-bottom: 2px solid #fff; border-right: 2px solid #fff; }
+
         .gold-wrapper { display: inline-flex; align-items: center; }
         .gold-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1.5px solid #fff; border-radius: 50%; box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); color: #fff; font-size: 0.7rem; font-weight: 800; text-shadow: 0 0 5px var(--blue); margin-left: 5px; position: relative; top: -1px; }
 
-        /* ANIMAÇÕES & OUTROS */
         @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes sys-open { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
         .content { display: none; }
         .content.active { display: block; animation: system-fade 0.4s ease; }
 
-        /* STATUS */
         h2.tab-title { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--blue); margin-bottom: 30px; font-size: 1.8rem; margin-top: 10px; }
         .header-grid { display: grid; grid-template-columns: auto 1fr; gap: 25px; align-items: end; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 20px; margin-bottom: 20px; }
         .lvl-num { font-size: 4.5rem; font-weight: 700; text-shadow: 0 0 15px #fff; line-height: 0.8; }
@@ -127,7 +136,6 @@
         .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
         .xp-fill { background: #fff; box-shadow: 0 0 10px #fff; }
         .fatigue-fill { background: #ff3333; box-shadow: 0 0 10px #ff3333; }
-
         .stat-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 8px; }
         .stat-label { font-size: 1.2rem; font-weight: 600; color: #ccc; width: 50px; }
         .stat-val { font-size: 1.6rem; font-weight: 700; margin-left: 10px; color: #fff; text-shadow: var(--sys-text-glow); }
@@ -168,7 +176,6 @@
     </div>
 
     <div class="layout-wrapper">
-
         <div class="main-frame">
             
             <div id="sys-modal">
@@ -181,11 +188,25 @@
                 <button onclick="document.getElementById('sys-modal').style.display='none'" style="background:var(--blue); border:none; padding:8px 20px; font-weight:bold; cursor:pointer;">CONFIRM</button>
             </div>
 
-            <div id="ui-timer-container"><div id="timer" class="timer">00:00:00</div></div>
+            <div id="ui-timer-container">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg"
+                        d="M18 2.0845
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path class="circle" id="timer-path"
+                        stroke-dasharray="100, 100"
+                        d="M18 2.0845
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                </svg>
+                <div id="timer-text" class="timer-text-center"></div>
+            </div>
             
             <div class="top-right-stack">
                 <div id="ui-kebab"><button class="kebab-btn" onclick="ui.toggleSettings()"></button></div>
-                
                 <div id="ui-pts" class="res-row">
                     <span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="sys-num-unified">0</span>
                 </div>
@@ -263,36 +284,37 @@
             pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", claim: "[ RESGATAR XP ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Correr 10km", j0: "NENHUM", j2: "MONARCA DAS SOMBRAS", j3: "PASTOR DE ALMAS", j4: "TITÃ DO CREPÚSCULO", t0: "NENHUM", t1: "ASSASSINO DE LOBOS", t2: "SUPEROU A ADVERSIDADE", t3: "ASSASSINO DE DEMÔNIOS" }
         };
 
+        // Adicionado: timeLimit em segundos para cada dungeon
         const dungeonData = [
-            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5 },
-            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10 },
-            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20 },
-            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30 },
-            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50 },
-            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90 }
+            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, timeLimit: 300 }, // 5 min
+            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, timeLimit: 600 }, // 10 min
+            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, timeLimit: 900 }, // 15 min
+            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, timeLimit: 1200 }, // 20 min
+            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, timeLimit: 1800 }, // 30 min
+            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, timeLimit: 3600 } // 1 hora
         ];
 
         const itemPrices = { "Goblin Stone": 10, "Lycan Fang": 25, "Centipede Shell": 50, "Ice Crystal": 100, "Orc Tusk": 250, "Ant Wing": 1000, "Bandage": 15, "Potion": 50, "Return Stone": 100, "E-Rank Dagger": 250 };
 
+        let missionTimer = null; // Variável para controlar o intervalo do timer
+
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v37');
+                const s = localStorage.getItem('solo_v38');
                 if(s) this.data = JSON.parse(s);
-                ui.tab('status'); // CORREÇÃO DO BUG: Força atualização da UI na inicialização
+                
+                // CORREÇÃO DEFINITIVA DO GOLD:
+                // Força o Status a abrir primeiro e garante a visibilidade da caixa
+                ui.tab('status'); 
+                
                 ui.render();
-                setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v37', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v38', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v37'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v38'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
-            tick() {
-                const n = new Date(); const e = new Date(); e.setHours(23,59,59);
-                const d = e - n;
-                const h = Math.floor(d/3600000); const m = Math.floor((d%3600000)/60000); const s = Math.floor((d%60000)/1000);
-                document.getElementById('timer').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            },
+            
             toggle(i) { this.data.quests[i].done = !this.data.quests[i].done; this.save(); ui.render(); },
             claimDailyRewards() {
                 if(this.data.quests.every(q => q.done)) {
@@ -302,18 +324,34 @@
                     this.save(); ui.render(); ui.notify("REWARDS CLAIMED: XP +100");
                 }
             },
+            
+            // --- NOVA LÓGICA DE DUNGEON COM TIMER ---
             enterDungeon(idx) {
                 const dg = dungeonData[idx];
                 if(this.data.fatigue + dg.cost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; }
-                const successChance = 0.8;
+                
+                // Consome fadiga
                 this.data.fatigue += dg.cost;
-                if(Math.random() < successChance) {
-                    this.data.xp += dg.xp; this.data.inventory.push(dg.drop);
-                    if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; }
-                    ui.showSysModal(dg.mob, dg.drop);
-                } else { ui.notify("DEFEAT! ESCAPED SAFELY..."); }
-                this.save(); ui.render();
+                this.save();
+                ui.render();
+                
+                // Inicia o Timer da Missão
+                ui.startMissionTimer(dg.timeLimit, () => {
+                    // Função executada quando o timer ACABA (ou se passar no teste de sorte)
+                    const successChance = 0.8;
+                    ui.stopMissionTimer(); // Para o timer visual
+                    
+                    if(Math.random() < successChance) {
+                        this.data.xp += dg.xp; this.data.inventory.push(dg.drop);
+                        if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; }
+                        ui.showSysModal(dg.mob, dg.drop);
+                    } else { 
+                        ui.notify("DEFEAT! ESCAPED SAFELY..."); 
+                    }
+                    this.save(); ui.render();
+                });
             },
+
             buy(n, c) { if(this.data.gold >= c) { this.data.gold -= c; this.data.inventory.push(n); this.save(); ui.render(); ui.notify("BOUGHT: " + n); } else { ui.notify("NOT ENOUGH GOLD"); } },
             useItem(index) {
                 const item = this.data.inventory[index];
@@ -339,17 +377,19 @@
             tab(n) {
                 const els = { timer: document.getElementById('ui-timer-container'), kebab: document.getElementById('ui-kebab'), pts: document.getElementById('ui-pts'), goldBox: document.getElementById('gold-container-wrapper') };
                 
-                // Lógica de visibilidade
                 if (n === 'status') { 
-                    els.timer.style.opacity = '1'; els.kebab.style.display = 'flex'; els.pts.style.display = 'flex'; 
+                    // Mostra Gold e Points, mas ESCONDE o timer (a menos que esteja ativo globalmente, mas aqui simplificamos)
+                    // Se estiver em missão, o timer deve ficar visível independente da aba? 
+                    // Por enquanto, vamos manter o timer visível apenas se missionTimer estiver rodando.
+                    els.kebab.style.display = 'flex'; els.pts.style.display = 'flex'; 
                     els.goldBox.style.display = 'flex'; 
                 }
                 else if (n === 'shop') { 
-                    els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
+                    els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
                     els.goldBox.style.display = 'flex'; 
                 }
                 else { 
-                    els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
+                    els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
                     els.goldBox.style.display = 'none'; 
                 }
 
@@ -358,6 +398,57 @@
                 document.getElementById('tab-' + n).classList.add('active');
                 document.getElementById('n-' + n).classList.add('active');
             },
+
+            // --- FUNÇÕES DE TIMER DA MISSÃO ---
+            startMissionTimer(seconds, onComplete) {
+                const timerContainer = document.getElementById('ui-timer-container');
+                const timerText = document.getElementById('timer-text');
+                const timerPath = document.getElementById('timer-path');
+                
+                timerContainer.style.display = 'block'; // Aparece o relógio
+                let remaining = seconds;
+                const total = seconds;
+
+                // Reseta visual
+                timerPath.style.strokeDasharray = "100, 100";
+                
+                // Simulação rápida do progresso (Apenas visual, o cálculo de sucesso é instantâneo no código atual, 
+                // mas vamos fingir um delay de 3 segundos para "simular" a batalha e mostrar o relógio funcionando)
+                // Se quiser tempo real, remova o delay e use o setInterval real. 
+                // Para UX melhor neste app web, vamos fazer um "Quick Battle" de 3 segundos.
+                
+                let simulatedDuration = 3; // Batalha dura 3 segundos visualmente
+                let elapsed = 0;
+
+                if (missionTimer) clearInterval(missionTimer);
+
+                missionTimer = setInterval(() => {
+                    elapsed++;
+                    remaining = total - (elapsed * (total/simulatedDuration)); // Decaimento proporcional
+                    
+                    // Atualiza Círculo (Stroke Dasharray: value, 100)
+                    // 100 = cheio, 0 = vazio
+                    const percentage = Math.max(0, (1 - (elapsed / simulatedDuration)) * 100);
+                    timerPath.style.strokeDasharray = `${percentage}, 100`;
+
+                    // Formata texto
+                    const m = Math.floor(remaining / 60);
+                    const s = Math.floor(remaining % 60);
+                    timerText.innerText = `${m}:${s < 10 ? '0'+s : s}`;
+
+                    if (elapsed >= simulatedDuration) {
+                        clearInterval(missionTimer);
+                        timerContainer.style.display = 'none'; // Esconde ao terminar
+                        onComplete(); // Chama o resultado da batalha
+                    }
+                }, 1000); // Atualiza a cada segundo
+            },
+
+            stopMissionTimer() {
+                if (missionTimer) clearInterval(missionTimer);
+                document.getElementById('ui-timer-container').style.display = 'none';
+            },
+
             toggleSettings() { document.getElementById('m').style.display = (document.getElementById('m').style.display === 'flex') ? 'none' : 'flex'; },
             notify(m) { const n = document.getElementById('notification'); n.innerText = m; n.style.display = 'block'; setTimeout(() => n.style.display = 'none', 2000); },
             showSysModal(mob, item) {
