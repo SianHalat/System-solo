@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V35 - Alignment</title>
+    <title>SYSTEM V36 - Gold Box</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -30,87 +30,81 @@
             min-height: 100vh; 
             padding: 15px; 
             padding-bottom: 90px; 
+            display: flex;             /* Flex para centralizar o layout global */
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* CONTAINER CENTRAL (Mantém o Status e o Gold alinhados) */
+        .layout-wrapper {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
         }
 
         /* MOLDURA PRINCIPAL */
         .main-frame { 
-            width: 100%; max-width: 500px; border: 2px solid #fff; padding: 25px; 
-            background: rgba(2, 8, 20, 0.9); position: relative; box-shadow: var(--glow); 
-            margin: 0 auto; padding-top: 20px;
+            width: 100%; 
+            border: 2px solid #fff; 
+            padding: 25px; 
+            background: rgba(2, 8, 20, 0.9); 
+            position: relative; 
+            box-shadow: var(--glow); 
+            padding-top: 20px;
             backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            z-index: 10;
         }
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
+
+        /* --- NOVA CAIXA DE GOLD (ABAIXO DO STATUS) --- */
+        #gold-container-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end; /* Alinha à direita */
+            margin-top: 8px; /* Espaço entre o Status e o Gold */
+            display: none; /* Controlado pelo JS */
+        }
+
+        .gold-box-frame {
+            border: 2px solid #fff;
+            background: rgba(2, 8, 20, 0.9);
+            backdrop-filter: blur(4px);
+            box-shadow: var(--glow);
+            padding: 5px 20px; /* Fino (pouco padding vertical) */
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+        /* Detalhes de canto na caixa de Gold também */
+        .gold-box-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 6px; height: 6px; border-top: 2px solid #fff; border-left: 2px solid #fff; }
+        .gold-box-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 6px; height: 6px; border-bottom: 2px solid #fff; border-right: 2px solid #fff; }
+
 
         /* UI TOPO */
         #ui-timer-container { position: absolute; top: 25px; left: 25px; z-index: 50; transition: opacity 0.3s ease; }
         .timer { font-size: 1rem; font-weight: bold; color: #fff; text-shadow: var(--sys-text-glow); }
 
-        /* --- STACK DO TOPO DIREITO (AJUSTADO) --- */
         .top-right-stack { 
             position: absolute; 
-            top: 30px; /* Levemente mais para baixo */
+            top: 30px; 
             right: 25px; 
             display: flex; 
             flex-direction: column; 
             align-items: flex-end; 
-            gap: 5px; /* Espaço padrão entre linhas */
+            gap: 10px; 
             z-index: 50; 
         }
 
-        /* BOTÃO KEBAB (TRÊS PONTINHOS) - AGORA BRANCO COM GLOW AZUL */
-        .kebab-row {
-            margin-bottom: 15px; /* Mais espaço entre o botão e o dinheiro */
-        }
         .kebab-btn { width: 20px; height: 20px; position: relative; background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .kebab-btn::before { 
-            content: ''; 
-            width: 4px; height: 4px; 
-            border-radius: 50%; 
-            
-            /* Ponto Central Branco */
-            background: #fff; 
-            
-            /* Pontos Superior/Inferior Brancos */
-            box-shadow: 0 -7px 0 #fff, 0 7px 0 #fff; 
-            
-            /* Glow Azul no conjunto todo */
-            filter: drop-shadow(0 0 3px var(--blue)); 
-        }
+        .kebab-btn::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #fff; box-shadow: 0 -7px 0 #fff, 0 7px 0 #fff; filter: drop-shadow(0 0 3px var(--blue)); }
 
-        /* LINHAS DE RECURSOS (GOLD / POINTS) */
-        .res-row { 
-            font-size: 0.8rem; 
-            color: #8899aa; 
-            display: flex; 
-            gap: 10px; 
-            align-items: center; /* Alinha texto e número verticalmente */
-            justify-content: flex-end; 
-            height: 24px; /* Altura fixa para alinhar melhor */
-        }
+        .res-row { font-size: 0.8rem; color: #8899aa; display: flex; gap: 10px; align-items: center; justify-content: flex-end; height: 24px; }
+        .sys-num-unified { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 1.2rem; text-shadow: var(--sys-text-glow); letter-spacing: 1px; }
 
-        /* CLASSE UNIFICADA PARA NÚMEROS (GOLD E POINTS IGUAIS) */
-        .sys-num-unified {
-            color: #fff;
-            font-family: 'Chakra Petch', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem; /* Tamanho unificado para ambos */
-            text-shadow: var(--sys-text-glow);
-            letter-spacing: 1px;
-        }
-
-        /* Ícone G ajustado */
         .gold-wrapper { display: inline-flex; align-items: center; }
-        .gold-icon { 
-            display: inline-flex; align-items: center; justify-content: center; 
-            width: 18px; height: 18px; 
-            border: 1.5px solid #fff; border-radius: 50%; 
-            box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); 
-            color: #fff; font-size: 0.7rem; font-weight: 800; 
-            text-shadow: 0 0 5px var(--blue); 
-            margin-left: 5px;
-            position: relative; top: -1px;
-        }
+        .gold-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1.5px solid #fff; border-radius: 50%; box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); color: #fff; font-size: 0.7rem; font-weight: 800; text-shadow: 0 0 5px var(--blue); margin-left: 5px; position: relative; top: -1px; }
 
         /* ANIMAÇÕES & OUTROS */
         @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -127,19 +121,16 @@
         .info-val { color: #fff; font-weight: bold; text-transform: uppercase; text-shadow: var(--sys-text-glow); }
         .rank-box { color: #fff; border: 1px solid var(--blue); padding: 0 5px; margin-left: 5px; font-weight: bold; text-shadow: var(--sys-text-glow); box-shadow: 0 0 5px rgba(0, 234, 255, 0.3); }
         
-        /* BARRAS */
         .bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
         .xp-fill { background: #fff; box-shadow: 0 0 10px #fff; }
         .fatigue-fill { background: #ff3333; box-shadow: 0 0 10px #ff3333; }
 
-        /* STATS LIST */
         .stat-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 8px; }
         .stat-label { font-size: 1.2rem; font-weight: 600; color: #ccc; width: 50px; }
         .stat-val { font-size: 1.6rem; font-weight: 700; margin-left: 10px; color: #fff; text-shadow: var(--sys-text-glow); }
         .plus-btn { width: 24px; height: 24px; border: 1px solid var(--blue); margin-left: auto; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--blue); }
 
-        /* GERAL */
         .quest-item, .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
         .quest-reward { color: #888; font-size: 0.7rem; margin-left: 10px; }
         .mon-white { color: #fff; text-shadow: 0 0 5px #fff; }
@@ -174,79 +165,84 @@
         </div>
     </div>
 
-    <div class="main-frame">
-        
-        <div id="sys-modal">
-            <h3 style="color:#fff; margin-bottom:10px;">YOU DEFEATED THE ENEMY</h3>
-            <div id="sys-msg-detail" style="color:#aaa; font-size:0.9rem; margin-bottom:15px;"></div>
-            <div style="font-size:1.2rem; color:var(--blue); margin-bottom:15px; border:1px solid var(--blue); padding:10px; width:100%;">
-                ITEM ACQUIRED<br>
-                <span id="sys-item-name" style="color:#fff; font-weight:bold;">NONE</span>
+    <div class="layout-wrapper">
+
+        <div class="main-frame">
+            
+            <div id="sys-modal">
+                <h3 style="color:#fff; margin-bottom:10px;">YOU DEFEATED THE ENEMY</h3>
+                <div id="sys-msg-detail" style="color:#aaa; font-size:0.9rem; margin-bottom:15px;"></div>
+                <div style="font-size:1.2rem; color:var(--blue); margin-bottom:15px; border:1px solid var(--blue); padding:10px; width:100%;">
+                    ITEM ACQUIRED<br>
+                    <span id="sys-item-name" style="color:#fff; font-weight:bold;">NONE</span>
+                </div>
+                <button onclick="document.getElementById('sys-modal').style.display='none'" style="background:var(--blue); border:none; padding:8px 20px; font-weight:bold; cursor:pointer;">CONFIRM</button>
             </div>
-            <button onclick="document.getElementById('sys-modal').style.display='none'" style="background:var(--blue); border:none; padding:8px 20px; font-weight:bold; cursor:pointer;">CONFIRM</button>
+
+            <div id="ui-timer-container"><div id="timer" class="timer">00:00:00</div></div>
+            
+            <div class="top-right-stack">
+                <div id="ui-kebab"><button class="kebab-btn" onclick="ui.toggleSettings()"></button></div>
+                <div id="ui-pts" class="res-row">
+                    <span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="sys-num-unified">0</span>
+                </div>
+            </div>
+
+            <div id="tab-status" class="content active">
+                <h2 id="txt-status" class="tab-title">STATUS</h2>
+                <div class="header-grid">
+                    <div><div id="val-lvl" class="lvl-num">1</div><div style="font-size:0.7rem; color:var(--blue); text-align:center;">LEVEL</div></div>
+                    <div class="info-box">
+                        <div class="info-row">RANK: <span id="val-rank" class="rank-box">E</span></div>
+                        <div class="info-row">JOB: <span id="val-job" class="info-val" style="margin-left:5px;">NONE</span></div>
+                        <div class="info-row">TITLE: <span id="val-title" class="info-val" style="margin-left:5px;">NONE</span></div>
+                        <div style="font-size:0.6rem; margin-top:10px;">XP</div>
+                        <div class="bar-container"><div id="xp-bar" class="bar-fill xp-fill"></div></div>
+                        <div style="font-size:0.6rem; margin-top:5px;">FATIGUE: <span id="val-fatigue-num">0</span>%</div>
+                        <div class="bar-container"><div id="fatigue-bar" class="bar-fill fatigue-fill"></div></div>
+                    </div>
+                </div>
+                <div class="stats-list">
+                    <div class="stat-row"><span class="stat-label">STR</span><span id="val-STR" class="stat-val">10</span><div class="plus-btn" onclick="game.add('STR')">+</div></div>
+                    <div class="stat-row"><span class="stat-label">VIT</span><span id="val-VIT" class="stat-val">10</span><div class="plus-btn" onclick="game.add('VIT')">+</div></div>
+                    <div class="stat-row"><span class="stat-label">AGI</span><span id="val-AGI" class="stat-val">10</span><div class="plus-btn" onclick="game.add('AGI')">+</div></div>
+                    <div class="stat-row"><span class="stat-label">INT</span><span id="val-INT" class="stat-val">10</span><div class="plus-btn" onclick="game.add('INT')">+</div></div>
+                    <div class="stat-row"><span class="stat-label">PER</span><span id="val-PER" class="stat-val">10</span><div class="plus-btn" onclick="game.add('PER')">+</div></div>
+                </div>
+            </div>
+
+            <div id="tab-quests" class="content">
+                <h2 id="txt-quests" class="tab-title">DAILY QUESTS</h2>
+                <div id="q-list"></div>
+                <button id="btn-claim" onclick="game.claimDailyRewards()" style="width:100%; padding:15px; margin-top:20px; border:1px solid var(--blue); color:var(--blue); background:rgba(0,234,255,0.1); font-weight:bold; cursor:pointer;">CLAIM XP</button>
+            </div>
+
+            <div id="tab-dungeon" class="content">
+                <h2 class="tab-title">DUNGEONS</h2>
+                <div id="dungeon-list"></div>
+            </div>
+
+            <div id="tab-shop" class="content">
+                <h2 id="txt-shop" class="tab-title">SHOP</h2>
+                <div class="shop-grid">
+                    <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span class="gold-wrapper"><span class="sys-num-unified">30</span><span class="gold-icon">G</span></span><br><small>-10 Fatigue</small></div>
+                    <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span class="gold-wrapper"><span class="sys-num-unified">100</span><span class="gold-icon">G</span></span><br><small>-40 Fatigue</small></div>
+                    <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span class="gold-wrapper"><span class="sys-num-unified">200</span><span class="gold-icon">G</span></span></div>
+                    <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span class="gold-wrapper"><span class="sys-num-unified">500</span><span class="gold-icon">G</span></span></div>
+                </div>
+                <h3 style="margin-top:25px; border-bottom:1px solid #333;" id="txt-inv">INVENTORY</h3>
+                <div id="inv-list" style="padding-top:10px;"></div>
+            </div>
+
         </div>
 
-        <div id="ui-timer-container"><div id="timer" class="timer">00:00:00</div></div>
-        
-        <div class="top-right-stack">
-            <div id="ui-kebab" class="kebab-row"><button class="kebab-btn" onclick="ui.toggleSettings()"></button></div>
-            
-            <div id="ui-gold" class="res-row">
-                <span id="txt-gold-lbl">GOLD:</span> 
+        <div id="gold-container-wrapper">
+            <div class="gold-box-frame">
+                <span id="txt-gold-lbl" style="font-size:0.8rem; color:#8899aa;">GOLD:</span> 
                 <span class="gold-wrapper">
                     <span id="val-gold" class="sys-num-unified">0</span><span class="gold-icon">G</span>
                 </span>
             </div>
-            
-            <div id="ui-pts" class="res-row">
-                <span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="sys-num-unified">0</span>
-            </div>
-        </div>
-
-        <div id="tab-status" class="content active">
-            <h2 id="txt-status" class="tab-title">STATUS</h2>
-            <div class="header-grid">
-                <div><div id="val-lvl" class="lvl-num">1</div><div style="font-size:0.7rem; color:var(--blue); text-align:center;">LEVEL</div></div>
-                <div class="info-box">
-                    <div class="info-row">RANK: <span id="val-rank" class="rank-box">E</span></div>
-                    <div class="info-row">JOB: <span id="val-job" class="info-val" style="margin-left:5px;">NONE</span></div>
-                    <div class="info-row">TITLE: <span id="val-title" class="info-val" style="margin-left:5px;">NONE</span></div>
-                    <div style="font-size:0.6rem; margin-top:10px;">XP</div>
-                    <div class="bar-container"><div id="xp-bar" class="bar-fill xp-fill"></div></div>
-                    <div style="font-size:0.6rem; margin-top:5px;">FATIGUE: <span id="val-fatigue-num">0</span>%</div>
-                    <div class="bar-container"><div id="fatigue-bar" class="bar-fill fatigue-fill"></div></div>
-                </div>
-            </div>
-            <div class="stats-list">
-                <div class="stat-row"><span class="stat-label">STR</span><span id="val-STR" class="stat-val">10</span><div class="plus-btn" onclick="game.add('STR')">+</div></div>
-                <div class="stat-row"><span class="stat-label">VIT</span><span id="val-VIT" class="stat-val">10</span><div class="plus-btn" onclick="game.add('VIT')">+</div></div>
-                <div class="stat-row"><span class="stat-label">AGI</span><span id="val-AGI" class="stat-val">10</span><div class="plus-btn" onclick="game.add('AGI')">+</div></div>
-                <div class="stat-row"><span class="stat-label">INT</span><span id="val-INT" class="stat-val">10</span><div class="plus-btn" onclick="game.add('INT')">+</div></div>
-                <div class="stat-row"><span class="stat-label">PER</span><span id="val-PER" class="stat-val">10</span><div class="plus-btn" onclick="game.add('PER')">+</div></div>
-            </div>
-        </div>
-
-        <div id="tab-quests" class="content">
-            <h2 id="txt-quests" class="tab-title">DAILY QUESTS</h2>
-            <div id="q-list"></div>
-            <button id="btn-claim" onclick="game.claimDailyRewards()" style="width:100%; padding:15px; margin-top:20px; border:1px solid var(--blue); color:var(--blue); background:rgba(0,234,255,0.1); font-weight:bold; cursor:pointer;">CLAIM XP</button>
-        </div>
-
-        <div id="tab-dungeon" class="content">
-            <h2 class="tab-title">DUNGEONS</h2>
-            <div id="dungeon-list"></div>
-        </div>
-
-        <div id="tab-shop" class="content">
-            <h2 id="txt-shop" class="tab-title">SHOP</h2>
-            <div class="shop-grid">
-                <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span class="gold-wrapper"><span class="sys-num-unified">30</span><span class="gold-icon">G</span></span><br><small>-10 Fatigue</small></div>
-                <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span class="gold-wrapper"><span class="sys-num-unified">100</span><span class="gold-icon">G</span></span><br><small>-40 Fatigue</small></div>
-                <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span class="gold-wrapper"><span class="sys-num-unified">200</span><span class="gold-icon">G</span></span></div>
-                <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span class="gold-wrapper"><span class="sys-num-unified">500</span><span class="gold-icon">G</span></span></div>
-            </div>
-            <h3 style="margin-top:25px; border-bottom:1px solid #333;" id="txt-inv">INVENTORY</h3>
-            <div id="inv-list" style="padding-top:10px;"></div>
         </div>
 
     </div>
@@ -278,14 +274,14 @@
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v35');
+                const s = localStorage.getItem('solo_v36');
                 if(s) this.data = JSON.parse(s);
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v35', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v36', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v35'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v36'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             tick() {
                 const n = new Date(); const e = new Date(); e.setHours(23,59,59);
@@ -337,10 +333,22 @@
 
         const ui = {
             tab(n) {
-                const els = { timer: document.getElementById('ui-timer-container'), kebab: document.getElementById('ui-kebab'), gold: document.getElementById('ui-gold'), pts: document.getElementById('ui-pts') };
-                if (n === 'status') { els.timer.style.opacity = '1'; els.kebab.style.display = 'flex'; els.gold.style.display = 'flex'; els.pts.style.display = 'flex'; }
-                else if (n === 'shop') { els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.gold.style.display = 'flex'; els.pts.style.display = 'none'; }
-                else { els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.gold.style.display = 'none'; els.pts.style.display = 'none'; }
+                const els = { timer: document.getElementById('ui-timer-container'), kebab: document.getElementById('ui-kebab'), pts: document.getElementById('ui-pts'), goldBox: document.getElementById('gold-container-wrapper') };
+                
+                // Lógica de visibilidade
+                if (n === 'status') { 
+                    els.timer.style.opacity = '1'; els.kebab.style.display = 'flex'; els.pts.style.display = 'flex'; 
+                    els.goldBox.style.display = 'flex'; // Mostra a caixa de Ouro nova
+                }
+                else if (n === 'shop') { 
+                    els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
+                    els.goldBox.style.display = 'flex'; // Mostra Ouro no Shop também
+                }
+                else { 
+                    els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
+                    els.goldBox.style.display = 'none'; // Esconde nas outras
+                }
+
                 document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 document.getElementById('tab-' + n).classList.add('active');
