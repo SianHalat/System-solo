@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V41 - Cooldowns</title>
+    <title>SYSTEM V42 - Fluid Timer</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -41,28 +41,13 @@
             width: 100%; border: 2px solid #fff; padding: 25px; 
             background: rgba(2, 8, 20, 0.9); position: relative; box-shadow: var(--glow); 
             padding-top: 20px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 10;
+            min-height: 600px; /* Altura mínima para acomodar o timer lá embaixo */
+            display: flex; flex-direction: column; /* Para organizar o conteúdo */
         }
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
 
-        /* --- TIMER DIGITAL DE MISSÃO --- */
-        #ui-timer-container { 
-            position: absolute; 
-            top: 25px; 
-            left: 25px; 
-            z-index: 50; 
-            display: none; 
-        }
-        
-        .mission-timer-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: var(--sys-text-glow);
-            letter-spacing: 2px;
-        }
-
-        /* --- INTERFACE DIREITA --- */
+        /* --- INTERFACE DIREITA (Status/Pontos) --- */
         .top-right-stack { 
             position: absolute; top: 30px; right: 25px; 
             display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 50; 
@@ -87,7 +72,14 @@
 
         @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes sys-open { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
-        .content { display: none; }
+        
+        /* ANIMAÇÃO DO TIMER FLUIDA */
+        @keyframes timer-slide-up {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .content { display: none; width: 100%; }
         .content.active { display: block; animation: system-fade 0.4s ease; }
 
         h2.tab-title { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--blue); margin-bottom: 30px; font-size: 1.8rem; margin-top: 10px; }
@@ -109,11 +101,11 @@
 
         .quest-item, .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
         .quest-reward { color: #888; font-size: 0.7rem; margin-left: 10px; }
+        
         .mon-white { color: #fff; text-shadow: 0 0 5px #fff; }
         .mon-orange { color: #FFA500; text-shadow: 0 0 5px #FFA500; } 
         .mon-red { color: var(--red); text-shadow: 0 0 5px var(--red); }
         
-        /* BOTÕES DE ENTRADA E CLAIM - ESTADOS */
         .enter-btn { border: 1px solid var(--red); color: var(--red); background: rgba(255, 50, 50, 0.1); padding: 5px 15px; font-weight: bold; cursor: pointer; min-width: 80px; }
         .enter-btn.cooldown { border: 1px solid var(--gray); color: var(--gray); background: rgba(0,0,0,0.5); cursor: not-allowed; font-size: 0.7rem; }
         
@@ -127,6 +119,39 @@
         .item-btn-group { display: flex; gap: 5px; }
         .use-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
         .sell-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; text-shadow: 0 0 5px var(--blue); }
+        
+        /* --- NOVO TIMER DE MISSÃO FLUIDO --- */
+        /* Container que aparece na parte inferior do dungeon/quest tab */
+        .active-mission-box {
+            margin-top: 30px;
+            margin-bottom: 10px;
+            padding: 15px;
+            border: 2px solid var(--blue);
+            background: rgba(0, 234, 255, 0.05);
+            text-align: center;
+            display: none; /* Controlado por JS */
+            box-shadow: inset 0 0 15px rgba(0, 234, 255, 0.1);
+            
+            /* Animação Fluida */
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .active-mission-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timer-digits {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 15px var(--blue);
+            font-family: 'Chakra Petch', sans-serif;
+            letter-spacing: 3px;
+        }
+
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #02050a; border-top: 2px solid #fff; display: flex; justify-content: space-around; padding: 15px 0; z-index: 100; }
         .nav-btn { background: none; border: none; color: #444; font-family: inherit; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; }
         .nav-btn.active { color: #fff; text-shadow: var(--glow); transform: scale(1.1); }
@@ -159,10 +184,6 @@
                     <span id="sys-item-name" style="color:#fff; font-weight:bold;">NONE</span>
                 </div>
                 <button onclick="document.getElementById('sys-modal').style.display='none'" style="background:var(--blue); border:none; padding:8px 20px; font-weight:bold; cursor:pointer;">CONFIRM</button>
-            </div>
-
-            <div id="ui-timer-container">
-                <div id="mission-timer-text" class="mission-timer-text">TIME: 00:00:00</div>
             </div>
             
             <div class="top-right-stack">
@@ -204,6 +225,10 @@
             <div id="tab-dungeon" class="content">
                 <h2 class="tab-title">DUNGEONS</h2>
                 <div id="dungeon-list"></div>
+
+                <div id="active-mission-box" class="active-mission-box">
+                    <div id="mission-timer-text" class="timer-digits">00:00:00</div>
+                </div>
             </div>
 
             <div id="tab-shop" class="content">
@@ -244,13 +269,10 @@
             pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", claim: "[ RESGATAR XP ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Correr 10km", j0: "NENHUM", j2: "MONARCA DAS SOMBRAS", j3: "PASTOR DE ALMAS", j4: "TITÃ DO CREPÚSCULO", t0: "NENHUM", t1: "ASSASSINO DE LOBOS", t2: "SUPEROU A ADVERSIDADE", t3: "ASSASSINO DE DEMÔNIOS" }
         };
 
-        // Cooldown em Milissegundos (ms)
         const MIN = 60000;
         const HOUR = 3600000;
         
         const dungeonData = [
-            // visualTime: Tempo da batalha (segundos)
-            // cooldownTime: Tempo para resetar (ms)
             { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, visualTime: 3, cooldownTime: 5 * MIN }, 
             { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, visualTime: 5, cooldownTime: 15 * MIN }, 
             { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, visualTime: 8, cooldownTime: 30 * MIN }, 
@@ -263,7 +285,6 @@
 
         let missionTimer = null; 
 
-        // Função auxiliar para formatar ms em HH:MM:SS
         function msToTime(duration) {
             let seconds = Math.floor((duration / 1000) % 60);
             let minutes = Math.floor((duration / (1000 * 60)) % 60);
@@ -277,31 +298,27 @@
                 pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', 
                 inventory: [], 
                 quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}],
-                dungeonCooldowns: [], // Armazena timestamp de quando a dungeon libera
-                dailyReset: null // Timestamp de quando a daily libera
+                dungeonCooldowns: [],
+                dailyReset: null 
             },
             init() {
-                const s = localStorage.getItem('solo_v41');
+                const s = localStorage.getItem('solo_v42');
                 if(s) {
                     const parsed = JSON.parse(s);
-                    this.data = {...this.data, ...parsed}; // Merge seguro
-                    // Garante arrays
+                    this.data = {...this.data, ...parsed};
                     if(!this.data.dungeonCooldowns) this.data.dungeonCooldowns = [];
                 }
                 ui.tab('status'); 
                 ui.render();
-                setInterval(() => this.tick(), 1000); // Game Loop Principal
+                setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v41', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v42', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v41'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v42'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             
-            // Loop de Verificação (Roda a cada 1s)
             tick() {
                 const now = Date.now();
-                
-                // Verifica Daily Reset
                 if (this.data.dailyReset && now >= this.data.dailyReset) {
                     this.data.dailyReset = null;
                     this.data.quests.forEach(q => q.done = false);
@@ -309,13 +326,9 @@
                     this.save();
                     ui.render();
                 }
-
-                // Atualiza UI de botões de Dungeon (se estiver na aba)
                 if(document.getElementById('tab-dungeon').classList.contains('active')) {
                     ui.updateDungeonButtons();
                 }
-
-                // Atualiza botão de Claim (se estiver na aba)
                 if(document.getElementById('tab-quests').classList.contains('active')) {
                     ui.updateClaimButton();
                 }
@@ -323,7 +336,7 @@
 
             // --- DAILY QUESTS ---
             toggle(i) { 
-                if (this.data.dailyReset) return; // Bloqueado se já completou hoje
+                if (this.data.dailyReset) return; 
 
                 const q = this.data.quests[i];
                 if(q.done) {
@@ -331,29 +344,28 @@
                     this.save();
                     ui.render();
                 } else {
-                    ui.startMissionTimer(3, () => {
-                        q.done = true;
-                        this.save();
-                        ui.render();
-                        ui.notify("COMPLETED");
-                    });
+                    // Sem timer para Daily Quest individual, apenas marcar
+                    q.done = true;
+                    this.save();
+                    ui.render();
                 }
             },
 
             claimDailyRewards() {
-                if (this.data.dailyReset) return; // Já pegou
+                if (this.data.dailyReset) return; 
 
                 if(this.data.quests.every(q => q.done)) {
                     this.data.xp += 100; 
                     this.data.fatigue -= 20; if(this.data.fatigue < 0) this.data.fatigue = 0;
                     if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; ui.notify("LEVEL UP!"); }
                     
-                    // Define cooldown de 24h
                     this.data.dailyReset = Date.now() + (24 * HOUR);
                     
                     this.save(); 
                     ui.render(); 
                     ui.notify("REWARDS CLAIMED. RESET IN 24H.");
+                } else {
+                    ui.notify("COMPLETE ALL QUESTS FIRST");
                 }
             },
             
@@ -362,7 +374,6 @@
                 const now = Date.now();
                 const unlockTime = this.data.dungeonCooldowns[idx] || 0;
                 
-                // Verifica Cooldown
                 if (now < unlockTime) { ui.notify("DUNGEON LOCKED"); return; }
 
                 const dg = dungeonData[idx];
@@ -372,8 +383,8 @@
                 this.save();
                 ui.render();
                 
+                // Inicia Timer Fluido na parte inferior
                 ui.startMissionTimer(dg.visualTime, () => {
-                    // Define o Cooldown da Dungeon APÓS terminar a batalha
                     this.data.dungeonCooldowns[idx] = Date.now() + dg.cooldownTime;
 
                     const successChance = 0.8;
@@ -413,7 +424,7 @@
 
         const ui = {
             tab(n) {
-                const els = { timer: document.getElementById('ui-timer-container'), kebab: document.getElementById('ui-kebab'), pts: document.getElementById('ui-pts'), goldBox: document.getElementById('gold-container-wrapper') };
+                const els = { kebab: document.getElementById('ui-kebab'), pts: document.getElementById('ui-pts'), goldBox: document.getElementById('gold-container-wrapper') };
                 const showResources = (n === 'status' || n === 'shop');
                 els.goldBox.style.display = showResources ? 'flex' : 'none';
                 els.kebab.style.display = (n === 'status') ? 'flex' : 'none';
@@ -426,30 +437,48 @@
             },
 
             startMissionTimer(durationSeconds, onComplete) {
-                const timerContainer = document.getElementById('ui-timer-container');
+                const timerContainer = document.getElementById('active-mission-box');
                 const timerText = document.getElementById('mission-timer-text');
-                timerContainer.style.display = 'block'; 
+                
+                timerContainer.style.display = 'block';
+                // Trigger reflow para a animação funcionar
+                void timerContainer.offsetWidth; 
+                timerContainer.classList.add('visible');
+                
                 let remaining = durationSeconds;
-                let m = Math.floor(remaining / 60); let s = Math.floor(remaining % 60);
-                timerText.innerText = `TIME: ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}:00`;
+                
+                const updateText = () => {
+                   let m = Math.floor(remaining / 60);
+                   let s = Math.floor(remaining % 60);
+                   let ms = Math.floor((remaining % 1) * 100);
+                   timerText.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}:${ms < 10 ? '0'+ms : ms}`;
+                };
+                
+                updateText();
 
                 if (missionTimer) clearInterval(missionTimer);
                 missionTimer = setInterval(() => {
                     remaining -= 0.1; 
                     if (remaining <= 0) {
                         clearInterval(missionTimer);
-                        timerText.innerText = `TIME: 00:00:00`;
-                        setTimeout(() => { timerContainer.style.display = 'none'; onComplete(); }, 500);
+                        timerText.innerText = `00:00:00`;
+                        // Delay para fechar
+                        setTimeout(() => { 
+                             onComplete();
+                        }, 500);
                         return;
                     }
-                    m = Math.floor(remaining / 60); s = Math.floor(remaining % 60); let ms = Math.floor((remaining % 1) * 100);
-                    timerText.innerText = `TIME: ${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}:${ms < 10 ? '0'+ms : ms}`;
+                    updateText();
                 }, 100); 
             },
 
             stopMissionTimer() {
                 if (missionTimer) clearInterval(missionTimer);
-                document.getElementById('ui-timer-container').style.display = 'none';
+                const timerContainer = document.getElementById('active-mission-box');
+                timerContainer.classList.remove('visible');
+                setTimeout(() => {
+                    timerContainer.style.display = 'none';
+                }, 400); // Espera a animação de saída
             },
 
             updateDungeonButtons() {
@@ -458,13 +487,11 @@
                 btns.forEach((btn, i) => {
                     const unlockTime = game.data.dungeonCooldowns[i] || 0;
                     if (now < unlockTime) {
-                        // Está em Cooldown
                         const diff = unlockTime - now;
                         btn.innerText = msToTime(diff);
                         btn.classList.add('cooldown');
                         btn.disabled = true;
                     } else {
-                        // Está Disponível
                         btn.innerText = "ENTER";
                         btn.classList.remove('cooldown');
                         btn.disabled = false;
@@ -515,28 +542,25 @@
                 document.getElementById('val-title').innerText = t[game.getTitleKey(d.lvl)];
                 for(let k in d.stats) document.getElementById('val-'+k).innerText = d.stats[k];
                 
-                // RENDERIZAR QUESTS
                 const qL = document.getElementById('q-list'); qL.innerHTML = '';
                 const isDailyLocked = !!d.dailyReset;
                 d.quests.forEach((q, i) => {
                     const checked = q.done ? 'checked' : '';
-                    const disabled = isDailyLocked ? 'disabled' : ''; // Desabilita se já completou tudo
+                    const disabled = isDailyLocked ? 'disabled' : ''; 
                     qL.innerHTML += `<div class="quest-item"><div><span style="${q.done?'text-decoration:line-through;color:#444':''}">${t[q.id]}</span></div><input type="checkbox" onclick="game.toggle(${i}); return false;" ${checked} ${disabled}></div>`;
                 });
-                this.updateClaimButton(); // Atualiza botão de claim
+                this.updateClaimButton();
 
-                // RENDERIZAR DUNGEONS
                 const dL = document.getElementById('dungeon-list'); dL.innerHTML = '';
                 dungeonData.forEach((dg, i) => {
-                    // O estado do botão é controlado pelo game.tick(), aqui apenas criamos a estrutura
                     dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="enter-btn" onclick="game.enterDungeon(${i})">ENTER</button></div>`;
                 });
-                this.updateDungeonButtons(); // Força update imediato
+                this.updateDungeonButtons();
 
                 const iL = document.getElementById('inv-list');
                 if(d.inventory.length === 0) iL.innerHTML = `<div style="color:#444;text-align:center;">${t.empty}</div>`;
                 else iL.innerHTML = d.inventory.map((item, index) => `
-                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 8px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 8px;font-size:0.7rem;text-shadow:0 0 5px var(--blue);">${t.sell}</button></div></div>`).join('');
+                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;text-shadow:0 0 5px var(--blue);">${t.sell}</button></div></div>`).join('');
             }
         };
         game.init();
