@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V38 - Circular Timer</title>
+    <title>SYSTEM V39 - Immersive</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -18,6 +18,7 @@
         
         body { 
             background-color: #02050a;
+            /* Grid Digital */
             background-image: 
                 radial-gradient(circle at 50% 50%, transparent 20%, #02050a 120%),
                 linear-gradient(rgba(0, 234, 255, 0.08) 1px, transparent 1px),
@@ -44,15 +45,15 @@
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
 
-        /* --- NOVO RELÓGIO CIRCULAR SVG --- */
+        /* --- RELÓGIO CIRCULAR PURO (SEM NÚMEROS) --- */
         #ui-timer-container { 
             position: absolute; 
             top: 20px; 
             left: 20px; 
             z-index: 50; 
-            width: 60px; 
-            height: 60px;
-            display: none; /* Começa oculto */
+            width: 50px; 
+            height: 50px;
+            display: none; /* Controlado via JS */
         }
 
         .circular-chart {
@@ -60,33 +61,23 @@
             margin: 0 auto;
             max-width: 100%;
             max-height: 100%;
+            /* Rotaciona para começar do topo (12h) */
+            transform: rotate(-90deg); 
         }
 
         .circle-bg {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.1);
-            stroke-width: 3.8;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 4;
         }
 
         .circle {
             fill: none;
-            stroke-width: 2.8;
-            stroke-linecap: round;
+            stroke-width: 4; /* Espessura do anel */
+            stroke-linecap: round; /* Bordas arredondadas */
             stroke: var(--blue);
-            filter: drop-shadow(0 0 5px var(--blue));
-            /* Animação controlada via JS */
+            filter: drop-shadow(0 0 8px var(--blue)); /* Glow intenso */
             transition: stroke-dasharray 1s linear;
-        }
-
-        .timer-text-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 0.7rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 5px var(--blue);
         }
 
         /* --- INTERFACE DIREITA --- */
@@ -107,7 +98,6 @@
             display: flex;
             justify-content: flex-end; 
             margin-top: 8px; 
-            /* Importante: Começa visível aqui, mas o JS vai gerenciar as abas */
             display: none; 
         }
         .gold-box-frame {
@@ -202,7 +192,6 @@
                             a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                 </svg>
-                <div id="timer-text" class="timer-text-center"></div>
             </div>
             
             <div class="top-right-stack">
@@ -284,35 +273,30 @@
             pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", claim: "[ RESGATAR XP ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Correr 10km", j0: "NENHUM", j2: "MONARCA DAS SOMBRAS", j3: "PASTOR DE ALMAS", j4: "TITÃ DO CREPÚSCULO", t0: "NENHUM", t1: "ASSASSINO DE LOBOS", t2: "SUPEROU A ADVERSIDADE", t3: "ASSASSINO DE DEMÔNIOS" }
         };
 
-        // Adicionado: timeLimit em segundos para cada dungeon
         const dungeonData = [
-            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, timeLimit: 300 }, // 5 min
-            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, timeLimit: 600 }, // 10 min
-            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, timeLimit: 900 }, // 15 min
-            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, timeLimit: 1200 }, // 20 min
-            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, timeLimit: 1800 }, // 30 min
-            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, timeLimit: 3600 } // 1 hora
+            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, timeLimit: 300 }, 
+            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, timeLimit: 600 }, 
+            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, timeLimit: 900 }, 
+            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, timeLimit: 1200 }, 
+            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, timeLimit: 1800 }, 
+            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, timeLimit: 3600 } 
         ];
 
         const itemPrices = { "Goblin Stone": 10, "Lycan Fang": 25, "Centipede Shell": 50, "Ice Crystal": 100, "Orc Tusk": 250, "Ant Wing": 1000, "Bandage": 15, "Potion": 50, "Return Stone": 100, "E-Rank Dagger": 250 };
 
-        let missionTimer = null; // Variável para controlar o intervalo do timer
+        let missionTimer = null; 
 
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v38');
+                const s = localStorage.getItem('solo_v39');
                 if(s) this.data = JSON.parse(s);
-                
-                // CORREÇÃO DEFINITIVA DO GOLD:
-                // Força o Status a abrir primeiro e garante a visibilidade da caixa
-                ui.tab('status'); 
-                
+                ui.tab('status'); // CORREÇÃO DE BUG: Força o Status (e o Gold) a aparecer na inicialização
                 ui.render();
             },
-            save() { localStorage.setItem('solo_v38', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v39', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v38'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v39'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             
             toggle(i) { this.data.quests[i].done = !this.data.quests[i].done; this.save(); ui.render(); },
@@ -325,21 +309,19 @@
                 }
             },
             
-            // --- NOVA LÓGICA DE DUNGEON COM TIMER ---
+            // --- LÓGICA DE DUNGEON ---
             enterDungeon(idx) {
                 const dg = dungeonData[idx];
                 if(this.data.fatigue + dg.cost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; }
                 
-                // Consome fadiga
                 this.data.fatigue += dg.cost;
                 this.save();
                 ui.render();
                 
-                // Inicia o Timer da Missão
+                // Inicia o Timer (apenas visual, sem texto)
                 ui.startMissionTimer(dg.timeLimit, () => {
-                    // Função executada quando o timer ACABA (ou se passar no teste de sorte)
                     const successChance = 0.8;
-                    ui.stopMissionTimer(); // Para o timer visual
+                    ui.stopMissionTimer(); 
                     
                     if(Math.random() < successChance) {
                         this.data.xp += dg.xp; this.data.inventory.push(dg.drop);
@@ -378,9 +360,6 @@
                 const els = { timer: document.getElementById('ui-timer-container'), kebab: document.getElementById('ui-kebab'), pts: document.getElementById('ui-pts'), goldBox: document.getElementById('gold-container-wrapper') };
                 
                 if (n === 'status') { 
-                    // Mostra Gold e Points, mas ESCONDE o timer (a menos que esteja ativo globalmente, mas aqui simplificamos)
-                    // Se estiver em missão, o timer deve ficar visível independente da aba? 
-                    // Por enquanto, vamos manter o timer visível apenas se missionTimer estiver rodando.
                     els.kebab.style.display = 'flex'; els.pts.style.display = 'flex'; 
                     els.goldBox.style.display = 'flex'; 
                 }
@@ -399,49 +378,33 @@
                 document.getElementById('n-' + n).classList.add('active');
             },
 
-            // --- FUNÇÕES DE TIMER DA MISSÃO ---
+            // --- TIMER VISUAL (SEM TEXTO) ---
             startMissionTimer(seconds, onComplete) {
                 const timerContainer = document.getElementById('ui-timer-container');
-                const timerText = document.getElementById('timer-text');
                 const timerPath = document.getElementById('timer-path');
                 
-                timerContainer.style.display = 'block'; // Aparece o relógio
-                let remaining = seconds;
-                const total = seconds;
-
-                // Reseta visual
-                timerPath.style.strokeDasharray = "100, 100";
-                
-                // Simulação rápida do progresso (Apenas visual, o cálculo de sucesso é instantâneo no código atual, 
-                // mas vamos fingir um delay de 3 segundos para "simular" a batalha e mostrar o relógio funcionando)
-                // Se quiser tempo real, remova o delay e use o setInterval real. 
-                // Para UX melhor neste app web, vamos fazer um "Quick Battle" de 3 segundos.
-                
-                let simulatedDuration = 3; // Batalha dura 3 segundos visualmente
+                timerContainer.style.display = 'block'; 
                 let elapsed = 0;
+                let simulatedDuration = 3; // Duração visual da "batalha"
 
                 if (missionTimer) clearInterval(missionTimer);
 
+                // Reseta visual para cheio
+                timerPath.style.strokeDasharray = "100, 100";
+
                 missionTimer = setInterval(() => {
-                    elapsed++;
-                    remaining = total - (elapsed * (total/simulatedDuration)); // Decaimento proporcional
+                    elapsed += 0.05; // Atualização suave
                     
-                    // Atualiza Círculo (Stroke Dasharray: value, 100)
-                    // 100 = cheio, 0 = vazio
+                    // Calcula a porcentagem restante (100 -> 0)
                     const percentage = Math.max(0, (1 - (elapsed / simulatedDuration)) * 100);
                     timerPath.style.strokeDasharray = `${percentage}, 100`;
 
-                    // Formata texto
-                    const m = Math.floor(remaining / 60);
-                    const s = Math.floor(remaining % 60);
-                    timerText.innerText = `${m}:${s < 10 ? '0'+s : s}`;
-
                     if (elapsed >= simulatedDuration) {
                         clearInterval(missionTimer);
-                        timerContainer.style.display = 'none'; // Esconde ao terminar
-                        onComplete(); // Chama o resultado da batalha
+                        timerContainer.style.display = 'none'; 
+                        onComplete(); 
                     }
-                }, 1000); // Atualiza a cada segundo
+                }, 50); 
             },
 
             stopMissionTimer() {
