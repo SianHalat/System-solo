@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V48 - Final Fixes</title>
+    <title>SYSTEM V49 - World Expansion</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
             --blue: #00eaff; 
-            --purple: #bf00ff; /* Apenas para Rank de Monstros */
-            --gold: #ffd700;   /* Apenas para Rank de Monstros */
-            --red: #ff3333;    /* Perigo / Perda de Vida */
-            --green: #33ff33;  /* Cura / Buff */
+            --purple: #bf00ff; 
+            --gold: #ffd700;
+            --red: #ff3333; 
+            --green: #33ff33;
             --gray: #444;
             --bg: #02050a;
             --sys-text-glow: 0 0 8px var(--blue);
@@ -36,11 +36,10 @@
             overflow-x: hidden;
         }
 
-        /* OVERLAYS DE EFEITO */
+        /* OVERLAYS */
         #toxic-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9000; opacity: 0; transition: opacity 0.5s; mix-blend-mode: overlay; }
         .toxic-red { background: radial-gradient(circle, transparent 50%, var(--red) 100%); animation: pulse-red 1s infinite; }
         .detox-green { background: radial-gradient(circle, transparent 50%, var(--green) 100%); animation: pulse-green 1s ease-out; }
-
         @keyframes pulse-red { 0% { opacity: 0.6; } 50% { opacity: 0.9; } 100% { opacity: 0.6; } }
         @keyframes pulse-green { 0% { opacity: 0; } 50% { opacity: 0.8; } 100% { opacity: 0; } }
 
@@ -74,7 +73,6 @@
 
         h2.tab-title { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--blue); margin-bottom: 20px; font-size: 1.8rem; margin-top: 10px; }
         
-        /* STATUS */
         .header-grid { display: grid; grid-template-columns: auto 1fr; gap: 25px; align-items: end; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 20px; margin-bottom: 20px; }
         .lvl-num { font-size: 4.5rem; font-weight: 700; text-shadow: 0 0 15px #fff; line-height: 0.8; }
         .info-box { display: flex; flex-direction: column; gap: 6px; }
@@ -94,7 +92,6 @@
         .stat-bonus { font-size: 0.9rem; color: var(--blue); margin-left: 5px; font-weight: normal; } 
         .plus-btn { width: 24px; height: 24px; border: 1px solid var(--blue); margin-left: auto; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--blue); }
 
-        /* SKILLS SECTION */
         .skills-container { margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; }
         .skill-header { font-size: 1rem; color: var(--blue); margin-bottom: 10px; font-weight: bold; }
         .skill-card { border: 1px solid #444; background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
@@ -104,17 +101,23 @@
         .skill-btn.active { background: var(--blue); color: #000; border-color: var(--blue); box-shadow: 0 0 8px var(--blue); font-weight: bold;}
         .skill-btn.passive { border: 1px solid #333; color: #888; cursor: default; }
 
-        /* QUESTS */
         .quest-item { display: flex; flex-direction: column; padding: 15px 0; border-bottom: 1px solid #333; }
         .q-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .q-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px;}
         .q-btn { background: #333; border: 1px solid #555; color: #fff; width: 30px; height: 30px; cursor: pointer; font-weight: bold; }
         .q-btn:disabled { opacity: 0.3; cursor: not-allowed; }
         .q-val { font-family: monospace; font-size: 1rem; color: var(--blue); width: 100px; text-align: center;}
-        .q-complete { color: var(--blue); text-shadow: 0 0 5px var(--blue); } /* Mudado para Azul */
-        .q-over { color: var(--blue); font-weight: bold; text-shadow: 0 0 8px var(--blue); } /* Mudado para Azul */
+        .q-complete { color: var(--blue); text-shadow: 0 0 5px var(--blue); } 
+        .q-over { color: var(--blue); font-weight: bold; text-shadow: 0 0 8px var(--blue); }
 
-        /* DUNGEONS */
+        /* ZONE SELECTOR */
+        .zone-selector {
+            width: 100%; padding: 10px; margin-bottom: 20px;
+            background: rgba(0,0,0,0.8); color: var(--blue);
+            border: 1px solid var(--blue); font-family: 'Chakra Petch', sans-serif;
+            font-weight: bold; text-transform: uppercase; outline: none;
+        }
+
         .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
         .mon-white { color: #fff; }
         .mon-orange { color: #FFA500; text-shadow: 0 0 5px #FFA500; } 
@@ -127,36 +130,16 @@
         .claim-btn { width:100%; padding:15px; margin-top:20px; border:1px solid var(--blue); color:var(--blue); background:rgba(0,234,255,0.1); font-weight:bold; cursor:pointer; }
         .claim-btn.disabled { border:1px solid var(--gray); color:var(--gray); background:transparent; cursor:not-allowed; }
 
-        /* SHOP FIX: CENTERED CONTENT */
         .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .shop-item { 
-            border: 1px solid var(--blue); 
-            padding: 12px; 
-            background: rgba(0,0,0,0.6); 
-            cursor: pointer; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; /* Centralizado verticalmente */
-            align-items: center; /* Centralizado horizontalmente */
-            text-align: center; 
-            height: 110px;
-            gap: 5px;
-        }
-        
+        .shop-item { border: 1px solid var(--blue); padding: 12px; background: rgba(0,0,0,0.6); cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 110px; gap: 5px; }
         .item-card { border: 1px solid var(--blue); background: rgba(0,234,255,0.05); padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;}
         .btn-small { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; margin-left: 5px;}
         .btn-small.equip { border-color: var(--purple); color: var(--purple); text-shadow: 0 0 5px var(--purple); }
 
-        /* MODALS */
         #sys-modal, #reward-modal, #penalty-modal { position: absolute; top: 150px; left: 5%; width: 90%; background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); box-shadow: 0 0 30px var(--blue); z-index: 2000; display: none; flex-direction: column; padding: 20px; text-align: center; animation: sys-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        /* CORES MODAIS */
         #penalty-modal { border-color: var(--red); box-shadow: 0 0 30px var(--red); top: 50px; }
-        /* Quest Complete agora é Azul */
         #reward-modal { border-color: var(--blue); box-shadow: 0 0 30px var(--blue); } 
-        
         .reward-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        /* Itens dentro da box com cor padrão do sistema (branco/azul) */
         .reward-box-item { border: 1px solid #fff; padding: 10px; color: #fff; font-size: 0.8rem; font-weight: bold; } 
         
         .timer-digits { font-size: 2.5rem; font-weight: 700; color: #fff; text-shadow: 0 0 15px var(--blue); font-family: 'Chakra Petch', sans-serif; letter-spacing: 3px; }
@@ -167,12 +150,9 @@
         .nav-btn { background: none; border: none; color: #444; font-family: inherit; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; }
         .nav-btn.active { color: #fff; text-shadow: var(--glow); transform: scale(1.1); }
         
-        /* NOTIFICATION STYLES */
         #notification { position: fixed; top: 20px; width: 80%; left: 10%; background: var(--blue); color: #000; padding: 10px; text-align: center; font-weight: bold; z-index: 3000; display: none; box-shadow: 0 0 20px var(--blue); animation: system-fade 0.2s; }
-        /* Classes auxiliares para cor do texto, embora o fundo seja padrão Azul para Neutro */
         #notification.positive { background: var(--green); color: #000; box-shadow: 0 0 20px var(--green); }
         #notification.negative { background: var(--red); color: #fff; box-shadow: 0 0 20px var(--red); }
-        /* Neutro (Azul) é o padrão definido no #notification */
     </style>
 </head>
 <body id="b">
@@ -262,8 +242,7 @@
 
                 <div class="skills-container">
                     <div class="skill-header">SKILLS <small style="font-weight:normal;color:#666;font-size:0.7rem">(Click to Toggle)</small></div>
-                    <div id="skills-list">
-                        </div>
+                    <div id="skills-list"></div>
                 </div>
             </div>
 
@@ -276,6 +255,12 @@
 
             <div id="tab-dungeon" class="content">
                 <h2 class="tab-title">DUNGEONS</h2>
+                <select id="zone-select" class="zone-selector" onchange="game.setZone(this.value)">
+                    <option value="city">CITY GATES</option>
+                    <option value="instance">INSTANT DUNGEONS</option>
+                    <option value="demon">DEMON CASTLE</option>
+                    <option value="jeju">JEJU ISLAND</option>
+                </select>
                 <div id="dungeon-list"></div>
                 <div id="active-mission-box" class="active-mission-box">
                     <div id="mission-timer-text" class="timer-digits">00:00:00</div>
@@ -322,32 +307,51 @@
         const MIN = 60000;
         const HOUR = 3600000;
         
-        // Items Database - Fixed Prices for Blessed/Cursed boxes
         const itemsDB = {
             "Bandage": { type: 'consume', price: 30, desc: "-10 Fatigue" },
             "Potion": { type: 'consume', price: 100, desc: "-40 Fatigue" },
             "Soju Bottle": { type: 'toxic', price: 50, desc: "Alcohol (+20 Fatigue)" },
             "Random Box": { type: 'consume', price: 500, desc: "Mystery Item" },
-            "Blessed Box": { type: 'consume', price: 2500, desc: "Rare Rewards" }, // Preço corrigido
-            "Cursed Box": { type: 'consume', price: 500, desc: "Risky Rewards" },  // Preço corrigido
+            "Blessed Box": { type: 'consume', price: 2500, desc: "Rare Rewards" },
+            "Cursed Box": { type: 'consume', price: 500, desc: "Risky Rewards" },
             "Instance Key": { type: 'misc', price: 100, desc: "Unlocks Subway" },
             "Demon Castle Key": { type: 'misc', price: 500, desc: "Unlocks S-Rank" },
             "E-Rank Dagger": { type: 'equip', price: 500, stats: {STR: 5, AGI: 2}, desc: "Basic Dagger" },
             "Kasaka's Venom Fang": { type: 'equip', price: 3000, stats: {STR: 15, AGI: 15}, desc: "Paralysis Effect" },
             "Knight Killer": { type: 'equip', price: 1500, stats: {STR: 25, VIT: 5}, desc: "Armor Pierce" },
             "Demon King's Dagger": { type: 'equip', price: 20000, stats: {STR: 60, AGI: 40}, desc: "S-Rank Weapon" },
-            "Goblin Stone": { type: 'misc', price: 10 }, "Lycan Fang": { type: 'misc', price: 25 }, "Centipede Shell": { type: 'misc', price: 50 }, "Ice Crystal": { type: 'misc', price: 100 }, "Orc Tusk": { type: 'misc', price: 250 }, "Ant Wing": { type: 'misc', price: 1000 }, "Baruka's Dagger": { type: 'equip', price: 5000, stats: {AGI:35, STR:10} }
+            "Orb of Avarice": { type: 'equip', price: 8000, stats: {INT: 50}, desc: "Magic Boost" },
+            "Goblin Stone": { type: 'misc', price: 10 }, 
+            "Lycan Fang": { type: 'misc', price: 25 }, 
+            "Centipede Shell": { type: 'misc', price: 50 }, 
+            "Ice Crystal": { type: 'misc', price: 100 }, 
+            "Orc Tusk": { type: 'misc', price: 250 }, 
+            "Ant Wing": { type: 'misc', price: 1000 }, 
+            "Baruka's Dagger": { type: 'equip', price: 5000, stats: {AGI:35, STR:10} },
+            "Demon Soul": { type: 'misc', price: 2000 }
         };
 
         const dungeonData = [
-            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, visualTime: 3, cooldownTime: 1 * MIN, minLvl: 1 }, 
-            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, visualTime: 5, cooldownTime: 5 * MIN, minLvl: 5 }, 
-            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, visualTime: 8, cooldownTime: 15 * MIN, minLvl: 15 }, 
-            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, visualTime: 10, cooldownTime: 30 * MIN, minLvl: 25 }, 
-            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, visualTime: 15, cooldownTime: 1 * HOUR, minLvl: 35 }, 
-            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, visualTime: 20, cooldownTime: 4 * HOUR, minLvl: 50 },
-            { name: "Red Gate: Ice Elves", mob: "Baruka", diff: "red", drop: "Baruka's Dagger", price: 5000, xp: 1500, cost: 100, visualTime: 30, cooldownTime: 12 * HOUR, minLvl: 60 },
-            { name: "Instant Dungeon: Subway", mob: "Blue Venom-Fang Kasaka", diff: "purple", drop: "Kasaka's Venom Fang", price: 0, xp: 600, cost: 50, visualTime: 15, cooldownTime: 0, minLvl: 1, isInstance: true } 
+            // CITY GATES
+            { zone: "city", name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", xp: 5, cost: 5, visualTime: 3, cooldownTime: 1 * MIN, minLvl: 1 }, 
+            { zone: "city", name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", xp: 15, cost: 10, visualTime: 5, cooldownTime: 5 * MIN, minLvl: 5 }, 
+            { zone: "city", name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", xp: 40, cost: 20, visualTime: 8, cooldownTime: 15 * MIN, minLvl: 15 }, 
+            { zone: "city", name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", xp: 80, cost: 30, visualTime: 10, cooldownTime: 30 * MIN, minLvl: 25 }, 
+            { zone: "city", name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", xp: 150, cost: 50, visualTime: 15, cooldownTime: 1 * HOUR, minLvl: 35 }, 
+            
+            // INSTANT DUNGEONS (Iconic)
+            { zone: "instance", name: "Hapjeong Subway", mob: "Blue Venom-Fang Kasaka", diff: "purple", drop: "Kasaka's Venom Fang", xp: 600, cost: 40, visualTime: 15, cooldownTime: 0, minLvl: 1, isInstance: true },
+            { zone: "instance", name: "Double Dungeon", mob: "Statue of God", diff: "purple", drop: "Cursed Box", xp: 0, cost: 90, visualTime: 20, cooldownTime: 24 * HOUR, minLvl: 10 },
+            { zone: "instance", name: "Job Change Quest", mob: "Blood-Red Igris", diff: "red", drop: "Knight Killer", xp: 2000, cost: 60, visualTime: 25, cooldownTime: 6 * HOUR, minLvl: 40 },
+
+            // DEMON CASTLE
+            { zone: "demon", name: "Lower Floors", mob: "Mean Soul", diff: "orange", drop: "Demon Soul", xp: 300, cost: 30, visualTime: 10, cooldownTime: 1 * HOUR, minLvl: 50 },
+            { zone: "demon", name: "Upper Floors", mob: "Vulcan of the Covetous", diff: "red", drop: "Orb of Avarice", xp: 1000, cost: 50, visualTime: 20, cooldownTime: 4 * HOUR, minLvl: 60 },
+            { zone: "demon", name: "Top Floor", mob: "Demon King Baran", diff: "purple", drop: "Demon King's Dagger", xp: 5000, cost: 80, visualTime: 30, cooldownTime: 12 * HOUR, minLvl: 75 },
+
+            // JEJU ISLAND
+            { zone: "jeju", name: "Outer Island", mob: "Giant Ant", diff: "red", drop: "Ant Wing", xp: 500, cost: 40, visualTime: 15, cooldownTime: 2 * HOUR, minLvl: 60 },
+            { zone: "jeju", name: "Ant Tunnel", mob: "Ant King Beru", diff: "purple", drop: "Black Heart (Core)", xp: 10000, cost: 100, visualTime: 40, cooldownTime: 48 * HOUR, minLvl: 80 }
         ];
 
         const skillsData = {
@@ -384,23 +388,26 @@
                 dungeonCooldowns: [],
                 lastLoginDay: new Date().toDateString(),
                 dailyCompleted: false,
-                instanceUnlocked: false
+                instanceUnlocked: false,
+                lastFatigueTick: Date.now(),
+                currentZone: 'city'
             },
             init() {
-                const s = localStorage.getItem('solo_v48');
+                const s = localStorage.getItem('solo_v49');
                 if(s) {
                     const parsed = JSON.parse(s);
                     this.data = {...this.data, ...parsed};
                     if(!this.data.activeSkills) this.data.activeSkills = [];
+                    if(!this.data.currentZone) this.data.currentZone = 'city';
                 }
                 this.checkDailyPenalty();
                 ui.tab('status'); 
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v48', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v49', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v48'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v49'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             getMaxXP(lvl) { return lvl * 100; },
             
@@ -436,15 +443,10 @@
             toggleSkill(skillName) {
                 const skillInfo = skillsData[skillName];
                 if(skillInfo.type === 'passive') return; 
-
                 const idx = this.data.activeSkills.indexOf(skillName);
-                if(idx > -1) {
-                    this.data.activeSkills.splice(idx, 1); 
-                } else {
-                    this.data.activeSkills.push(skillName); 
-                }
-                this.save();
-                ui.render();
+                if(idx > -1) this.data.activeSkills.splice(idx, 1); 
+                else this.data.activeSkills.push(skillName); 
+                this.save(); ui.render();
             },
 
             checkDailyPenalty() {
@@ -465,7 +467,24 @@
                 ui.notify("SURVIVED PENALTY ZONE", "negative");
             },
 
+            setZone(z) {
+                this.data.currentZone = z;
+                this.save();
+                ui.render();
+            },
+
             tick() {
+                const now = Date.now();
+                
+                // FATIGUE RECOVERY: 1 point every 5 mins
+                if (this.data.fatigue > 0 && (now - (this.data.lastFatigueTick || now)) >= (5 * MIN)) {
+                    this.data.fatigue = Math.max(0, this.data.fatigue - 1);
+                    this.data.lastFatigueTick = now;
+                    if(document.getElementById('tab-status').classList.contains('active')) ui.render();
+                    this.save();
+                }
+                if (!this.data.lastFatigueTick) this.data.lastFatigueTick = now;
+
                 if(document.getElementById('tab-dungeon').classList.contains('active')) {
                     ui.updateDungeonButtons();
                 }
@@ -485,33 +504,28 @@
 
             prepareReward() {
                 if(this.data.dailyCompleted) return;
-
                 const allComplete = this.data.quests.every(q => q.current >= q.target);
                 if(!allComplete) { ui.notify("COMPLETE ALL QUESTS"); return; }
 
                 const isHidden = this.data.quests.every(q => q.current >= q.target * 2);
-                
                 pendingRewards = [];
                 pendingRewards.push("Full Recovery");
                 pendingRewards.push("+3 Stat Points");
-                
                 if(isHidden) {
                     pendingRewards.push("Blessed Box");
                     pendingRewards.push("Hidden Reward: Cursed Box");
                 } else {
                     pendingRewards.push("Random Box");
                 }
-
                 ui.showRewardModal(pendingRewards, isHidden);
             },
 
             acceptRewards() {
                 if(!pendingRewards) return;
-                
                 this.data.fatigue = 0;
                 this.data.pts += 3;
                 this.data.xp += 100;
-                ui.notify("REWARDS ACCEPTED"); // Blue (Standard)
+                ui.notify("REWARDS ACCEPTED"); 
                 
                 pendingRewards.forEach(r => {
                     if(r === "Random Box") this.data.inventory.push("Random Box");
@@ -522,7 +536,6 @@
                 this.data.dailyCompleted = true;
                 this.checkLevelUp();
                 this.save();
-                
                 document.getElementById('reward-modal').style.display = 'none';
                 ui.render();
             },
@@ -549,10 +562,16 @@
             },
 
             enterDungeon(idx) {
-                const dg = dungeonData[idx];
+                // Find actual dungeon from filtered list
+                const filtered = dungeonData.filter(d => d.zone === this.data.currentZone);
+                const dg = filtered[idx];
+                
+                // Find global index for cooldown management
+                const globalIdx = dungeonData.findIndex(d => d.name === dg.name);
+
                 const now = Date.now();
                 if(!dg.isInstance) {
-                    const unlockTime = this.data.dungeonCooldowns[idx] || 0;
+                    const unlockTime = this.data.dungeonCooldowns[globalIdx] || 0;
                     if (now < unlockTime) { ui.notify("DUNGEON LOCKED", "negative"); return; }
                 }
 
@@ -574,11 +593,10 @@
                 const agiMod = Math.min(0.6, totalStats.AGI * 0.02);
                 const useSprint = this.data.activeSkills.includes("Sprint");
                 const sprintMod = useSprint ? 0.3 : 0; 
-
                 const finalTime = Math.max(1, dg.visualTime * (1 - agiMod - sprintMod));
 
                 ui.startMissionTimer(finalTime, () => {
-                    if(!dg.isInstance) this.data.dungeonCooldowns[idx] = Date.now() + dg.cooldownTime;
+                    if(!dg.isInstance) this.data.dungeonCooldowns[globalIdx] = Date.now() + dg.cooldownTime;
 
                     let winChance = 0.75 + (totalStats.STR * 0.01);
                     if(useStealth) winChance += 0.20; 
@@ -684,7 +702,6 @@
             sellItem(index) {
                 const item = this.data.inventory[index];
                 const dbItem = itemsDB[item];
-                // Se item não existe no DB, valor padrão 10. Se existe, usa preço.
                 const price = Math.floor((dbItem ? dbItem.price : 10) / 2); 
                 this.data.gold += price;
                 this.data.inventory.splice(index, 1);
@@ -758,19 +775,26 @@
             updateDungeonButtons() {
                 const now = Date.now();
                 const visibleBtns = document.querySelectorAll('.enter-btn');
-                visibleBtns.forEach(btn => {
+                
+                // Need to match filtered list again
+                const filtered = dungeonData.filter(d => d.zone === game.data.currentZone);
+                
+                visibleBtns.forEach((btn, i) => {
+                    if (i >= filtered.length) return; // Safety check
+                    const dg = filtered[i];
+                    
                     if(btn.classList.contains('instance')) { btn.innerText = "ENTER"; return; }
-                    const onclickAttr = btn.getAttribute('onclick'); 
-                    if(onclickAttr) {
-                        const idx = parseInt(onclickAttr.match(/\d+/)[0]);
-                        const unlockTime = game.data.dungeonCooldowns[idx] || 0;
-                        if (now < unlockTime) {
-                            btn.innerText = msToTime(unlockTime - now);
-                            btn.classList.add('cooldown'); btn.disabled = true;
-                        } else {
-                            btn.innerText = "ENTER";
-                            btn.classList.remove('cooldown'); btn.disabled = false;
-                        }
+                    
+                    // Find global index
+                    const globalIdx = dungeonData.findIndex(d => d.name === dg.name);
+                    const unlockTime = game.data.dungeonCooldowns[globalIdx] || 0;
+                    
+                    if (now < unlockTime) {
+                        btn.innerText = msToTime(unlockTime - now);
+                        btn.classList.add('cooldown'); btn.disabled = true;
+                    } else {
+                        btn.innerText = "ENTER";
+                        btn.classList.remove('cooldown'); btn.disabled = false;
                     }
                 });
             },
@@ -788,18 +812,12 @@
 
             toggleSettings() { document.getElementById('m').style.display = (document.getElementById('m').style.display === 'flex') ? 'none' : 'flex'; },
             
-            // LOGICA DE CORES DE NOTIFICAÇÃO
             notify(m, type = 'normal') { 
                 const n = document.getElementById('notification'); 
                 n.innerText = m; 
-                
-                // Reset classes
                 n.className = '';
-                
                 if (type === 'positive') n.classList.add('positive');
                 else if (type === 'negative') n.classList.add('negative');
-                // se 'normal', não adiciona nada, usa estilo padrão azul
-                
                 n.style.display = 'block'; 
                 setTimeout(() => n.style.display = 'none', 2000); 
             },
@@ -812,6 +830,7 @@
             
             render() {
                 const d = game.data; const t = trans[d.lang];
+                document.getElementById('zone-select').value = d.currentZone;
                 document.getElementById('txt-status').innerText = t.status;
                 document.getElementById('txt-quests').innerText = t.quests;
                 document.getElementById('txt-shop').innerText = t.shop;
@@ -889,15 +908,24 @@
                 });
                 this.updateClaimButton();
 
+                // DUNGEONS (FILTERED BY ZONE)
                 const dL = document.getElementById('dungeon-list'); dL.innerHTML = '';
-                dungeonData.forEach((dg, i) => {
-                    const showNormal = !dg.isInstance && d.lvl >= dg.minLvl;
-                    const showInstance = dg.isInstance && d.instanceUnlocked;
-                    if (showNormal || showInstance) {
+                const filteredDungeons = dungeonData.filter(d => d.zone === game.data.currentZone);
+                
+                if (filteredDungeons.length === 0) {
+                     dL.innerHTML = `<div style="text-align:center; color:#666; padding:20px;">LOCKED ZONE</div>`;
+                } else {
+                    filteredDungeons.forEach((dg, i) => {
+                        // Logic to unlock zones/dungeons could go here, for now all shown if zone selected
+                        // But strictly, instance is special.
+                        const show = !dg.isInstance || (dg.isInstance && (d.instanceUnlocked || dg.minLvl >= 10)); // Simple check
+                        
+                        // Style class
                         const styleClass = dg.isInstance ? 'enter-btn instance' : 'enter-btn';
+                        
                         dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="${styleClass}" onclick="game.enterDungeon(${i})">ENTER</button></div>`;
-                    }
-                });
+                    });
+                }
                 this.updateDungeonButtons();
 
                 const iL = document.getElementById('inv-list');
