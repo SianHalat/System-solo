@@ -3,145 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V31</title>
+    <title>SYSTEM V32</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
             --blue: #00eaff; 
             --glow: 0 0 10px #00eaff; 
-            --bg: #02050a; 
+            --bg: #02050a; /* Cor de fundo de fallback */
             --red: #ff3333; 
-            /* Estilo Unificado: Texto Branco + Sombra Azul */
             --sys-text-glow: 0 0 8px var(--blue);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
-        body { background: var(--bg); color: #fff; font-family: 'Chakra Petch', sans-serif; min-height: 100vh; padding: 15px; padding-bottom: 90px; }
-
-        /* --- CLASSE DE ESTILO UNIFICADO (BRANCO + GLOW AZUL) --- */
-        .sys-glow-text {
-            color: #fff !important;
-            text-shadow: var(--sys-text-glow);
-            font-weight: 700;
+        
+        /* --- ATUALIZAÇÃO DO PLANO DE FUNDO --- */
+        body { 
+            /* Define a imagem de fundo */
+            background-image: url('https://i.imgur.com/0000000.png'); /* Substitua pelo URL real da imagem */
+            
+            /* Ajusta a imagem para cobrir toda a tela, mantendo a proporção */
+            background-size: cover;
+            
+            /* Centraliza a imagem */
+            background-position: center center;
+            
+            /* Impede que a imagem se repita */
+            background-repeat: no-repeat;
+            
+            /* Fixa o fundo para que ele não role com o conteúdo (opcional, mas comum em UIs assim) */
+            background-attachment: fixed;
+            
+            /* Mantém a cor de fundo como fallback caso a imagem não carregue */
+            background-color: var(--bg);
+            
+            color: #fff; 
+            font-family: 'Chakra Petch', sans-serif; 
+            min-height: 100vh; 
+            padding: 15px; 
+            padding-bottom: 90px; 
         }
 
-        /* --- ESTILO DO GOLD --- */
+        /* MOLDURA PRINCIPAL (Ajuste de transparência para o novo fundo) */
+        .main-frame { 
+            width: 100%; 
+            max-width: 500px; 
+            border: 2px solid #fff; 
+            padding: 25px; 
+            /* Aumentei um pouco a transparência para o fundo holográfico aparecer mais */
+            background: rgba(2, 8, 15, 0.85); 
+            position: relative; 
+            box-shadow: var(--glow); 
+            margin: 0 auto; 
+            padding-top: 20px;
+            /* Adicionei um leve backdrop-filter para um efeito de vidro fosco moderno */
+            backdrop-filter: blur(5px);
+        }
+
+        /* Resto do CSS permanece o mesmo da V31... */
+        .sys-glow-text { color: #fff !important; text-shadow: var(--sys-text-glow); font-weight: 700; }
         .gold-wrapper { display: inline-flex; align-items: baseline; }
         .gold-num { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-shadow: var(--sys-text-glow); letter-spacing: 1px; margin-right: 4px; }
         .gold-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1.5px solid #fff; border-radius: 50%; box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); color: #fff; font-size: 0.7rem; font-weight: 800; text-shadow: 0 0 5px var(--blue); position: relative; top: -1px; }
-
-        /* MOLDURA PRINCIPAL */
-        .main-frame { width: 100%; max-width: 500px; border: 2px solid #fff; padding: 25px; background: rgba(2, 8, 15, 0.95); position: relative; box-shadow: var(--glow); margin: 0 auto; padding-top: 20px;}
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
-
-        /* UI TOPO */
         #ui-timer-container { position: absolute; top: 25px; left: 25px; z-index: 50; transition: opacity 0.3s ease; }
-        
-        /* TIMER (Agora Branco + Glow) */
-        .timer { 
-            font-size: 1rem; 
-            font-weight: bold; 
-            color: #fff; 
-            text-shadow: var(--sys-text-glow); 
-        }
-
+        .timer { font-size: 1rem; font-weight: bold; color: #fff; text-shadow: var(--sys-text-glow); }
         .top-right-stack { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 50; }
         .kebab-btn { width: 20px; height: 20px; position: relative; background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .kebab-btn::before { content: ''; width: 4px; height: 4px; background: var(--blue); border-radius: 50%; box-shadow: 0 -7px 0 var(--blue), 0 7px 0 var(--blue); filter: drop-shadow(0 0 2px var(--blue)); }
-
         .res-row { font-size: 0.8rem; color: #8899aa; display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
-        
-        /* POINTS (Agora Branco + Glow) */
-        .res-val-blue { 
-            color: #fff; 
-            font-weight: bold; 
-            font-size: 1.1rem; 
-            text-shadow: var(--sys-text-glow); 
-        }
-
-        /* ANIMAÇÕES */
+        .res-val-blue { color: #fff; font-weight: bold; font-size: 1.1rem; text-shadow: var(--sys-text-glow); }
         @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes sys-open { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
-
         .content { display: none; }
         .content.active { display: block; animation: system-fade 0.4s ease; }
-
-        /* HEADER STATUS */
         h2.tab-title { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--blue); margin-bottom: 30px; font-size: 1.8rem; margin-top: 10px; }
         .header-grid { display: grid; grid-template-columns: auto 1fr; gap: 25px; align-items: end; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 20px; margin-bottom: 20px; }
         .lvl-num { font-size: 4.5rem; font-weight: 700; text-shadow: 0 0 15px #fff; line-height: 0.8; }
-        
         .info-box { display: flex; flex-direction: column; gap: 6px; }
         .info-row { font-size: 0.85rem; color: #888; display: flex; align-items: center; margin-bottom: 4px; }
-        
-        /* JOB & TITLE (Agora Branco + Glow) */
-        .info-val { 
-            color: #fff; 
-            font-weight: bold; 
-            text-transform: uppercase;
-            text-shadow: var(--sys-text-glow);
-        }
-        
-        /* RANK BOX (Letra Branca + Glow) */
-        .rank-box {
-            color: #fff;
-            border: 1px solid var(--blue);
-            padding: 0 5px;
-            margin-left: 5px;
-            font-weight: bold;
-            text-shadow: var(--sys-text-glow);
-            box-shadow: 0 0 5px rgba(0, 234, 255, 0.3); /* Leve brilho na caixa */
-        }
-        
+        .info-val { color: #fff; font-weight: bold; text-transform: uppercase; text-shadow: var(--sys-text-glow); }
+        .rank-box { color: #fff; border: 1px solid var(--blue); padding: 0 5px; margin-left: 5px; font-weight: bold; text-shadow: var(--sys-text-glow); box-shadow: 0 0 5px rgba(0, 234, 255, 0.3); }
         .bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
         .xp-fill { background: #fff; box-shadow: 0 0 10px #fff; }
         .fatigue-fill { background: #ff3333; box-shadow: 0 0 10px #ff3333; }
-
         .stat-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 8px; }
         .stat-label { font-size: 1.2rem; font-weight: 600; color: #ccc; width: 50px; }
-        
-        /* STATS (STR, AGI...) JÁ ERAM ASSIM, MANTENDO PADRÃO */
         .stat-val { font-size: 1.6rem; font-weight: 700; margin-left: 10px; color: #fff; text-shadow: var(--sys-text-glow); }
-        
         .plus-btn { width: 24px; height: 24px; border: 1px solid var(--blue); margin-left: auto; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--blue); }
-
-        /* QUESTS & DUNGEONS */
         .quest-item, .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
         .quest-reward { color: #888; font-size: 0.7rem; margin-left: 10px; }
         .mon-white { color: #fff; text-shadow: 0 0 5px #fff; }
         .mon-orange { color: #FFA500; text-shadow: 0 0 5px #FFA500; } 
         .mon-red { color: var(--red); text-shadow: 0 0 5px var(--red); }
         .enter-btn { border: 1px solid var(--red); color: var(--red); background: rgba(255, 50, 50, 0.1); padding: 5px 15px; font-weight: bold; cursor: pointer; }
-
-        /* SYSTEM MODAL */
-        #sys-modal { 
-            position: absolute; top: 150px; left: 5%; width: 90%; 
-            background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); 
-            box-shadow: 0 0 30px var(--blue);
-            z-index: 2000; display: none; flex-direction: column; padding: 20px; text-align: center;
-            animation: sys-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* SHOP & INVENTORY */
+        #sys-modal { position: absolute; top: 150px; left: 5%; width: 90%; background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); box-shadow: 0 0 30px var(--blue); z-index: 2000; display: none; flex-direction: column; padding: 20px; text-align: center; animation: sys-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
         .shop-item { border: 1px solid var(--blue); padding: 12px; text-align: center; background: rgba(0,0,0,0.6); cursor: pointer; }
         .item-card { border: 1px solid var(--blue); background: rgba(0,234,255,0.05); padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .item-btn-group { display: flex; gap: 5px; }
         .use-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
         .sell-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; text-shadow: 0 0 5px var(--blue); }
-
-        /* NAV */
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #02050a; border-top: 2px solid #fff; display: flex; justify-content: space-around; padding: 15px 0; z-index: 100; }
         .nav-btn { background: none; border: none; color: #444; font-family: inherit; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; }
         .nav-btn.active { color: #fff; text-shadow: var(--glow); transform: scale(1.1); }
-        
         #notification { position: fixed; top: 20px; width: 80%; left: 10%; background: var(--blue); color: #000; padding: 10px; text-align: center; font-weight: bold; z-index: 3000; display: none; box-shadow: 0 0 20px var(--blue); animation: system-fade 0.2s; }
     </style>
 </head>
 <body id="b">
-
     <div id="notification">MSG</div>
 
     <div id="m" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; display:none; justify-content:center; align-items:center;">
