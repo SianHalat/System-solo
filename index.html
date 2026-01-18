@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V42 - Fluid Timer</title>
+    <title>SYSTEM V43 - Stats Matter</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -41,13 +41,12 @@
             width: 100%; border: 2px solid #fff; padding: 25px; 
             background: rgba(2, 8, 20, 0.9); position: relative; box-shadow: var(--glow); 
             padding-top: 20px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 10;
-            min-height: 600px; /* Altura mínima para acomodar o timer lá embaixo */
-            display: flex; flex-direction: column; /* Para organizar o conteúdo */
+            min-height: 600px; display: flex; flex-direction: column; 
         }
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
 
-        /* --- INTERFACE DIREITA (Status/Pontos) --- */
+        /* --- INTERFACE DIREITA --- */
         .top-right-stack { 
             position: absolute; top: 30px; right: 25px; 
             display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 50; 
@@ -66,19 +65,12 @@
         }
         .gold-box-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 6px; height: 6px; border-top: 2px solid #fff; border-left: 2px solid #fff; }
         .gold-box-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 6px; height: 6px; border-bottom: 2px solid #fff; border-right: 2px solid #fff; }
-
         .gold-wrapper { display: inline-flex; align-items: center; }
         .gold-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1.5px solid #fff; border-radius: 50%; box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); color: #fff; font-size: 0.7rem; font-weight: 800; text-shadow: 0 0 5px var(--blue); margin-left: 5px; position: relative; top: -1px; }
 
         @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes sys-open { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
         
-        /* ANIMAÇÃO DO TIMER FLUIDA */
-        @keyframes timer-slide-up {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
         .content { display: none; width: 100%; }
         .content.active { display: block; animation: system-fade 0.4s ease; }
 
@@ -90,7 +82,18 @@
         .info-val { color: #fff; font-weight: bold; text-transform: uppercase; text-shadow: var(--sys-text-glow); }
         .rank-box { color: #fff; border: 1px solid var(--blue); padding: 0 5px; margin-left: 5px; font-weight: bold; text-shadow: var(--sys-text-glow); box-shadow: 0 0 5px rgba(0, 234, 255, 0.3); }
         
-        .bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; }
+        /* NOVO DISPLAY DE XP */
+        .xp-text-display {
+            font-size: 0.8rem;
+            color: #fff;
+            text-shadow: var(--sys-text-glow);
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 5px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
         .xp-fill { background: #fff; box-shadow: 0 0 10px #fff; }
         .fatigue-fill { background: #ff3333; box-shadow: 0 0 10px #ff3333; }
@@ -120,37 +123,12 @@
         .use-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
         .sell-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; text-shadow: 0 0 5px var(--blue); }
         
-        /* --- NOVO TIMER DE MISSÃO FLUIDO --- */
-        /* Container que aparece na parte inferior do dungeon/quest tab */
+        /* TIMER FLUIDO */
         .active-mission-box {
-            margin-top: 30px;
-            margin-bottom: 10px;
-            padding: 15px;
-            border: 2px solid var(--blue);
-            background: rgba(0, 234, 255, 0.05);
-            text-align: center;
-            display: none; /* Controlado por JS */
-            box-shadow: inset 0 0 15px rgba(0, 234, 255, 0.1);
-            
-            /* Animação Fluida */
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 30px; margin-bottom: 10px; padding: 15px; border: 2px solid var(--blue); background: rgba(0, 234, 255, 0.05); text-align: center; display: none; box-shadow: inset 0 0 15px rgba(0, 234, 255, 0.1); opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        
-        .active-mission-box.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .timer-digits {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 0 15px var(--blue);
-            font-family: 'Chakra Petch', sans-serif;
-            letter-spacing: 3px;
-        }
+        .active-mission-box.visible { opacity: 1; transform: translateY(0); }
+        .timer-digits { font-size: 2.5rem; font-weight: 700; color: #fff; text-shadow: 0 0 15px var(--blue); font-family: 'Chakra Petch', sans-serif; letter-spacing: 3px; }
 
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #02050a; border-top: 2px solid #fff; display: flex; justify-content: space-around; padding: 15px 0; z-index: 100; }
         .nav-btn { background: none; border: none; color: #444; font-family: inherit; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; }
@@ -201,9 +179,13 @@
                         <div class="info-row">RANK: <span id="val-rank" class="rank-box">E</span></div>
                         <div class="info-row">JOB: <span id="val-job" class="info-val" style="margin-left:5px;">NONE</span></div>
                         <div class="info-row">TITLE: <span id="val-title" class="info-val" style="margin-left:5px;">NONE</span></div>
-                        <div style="font-size:0.6rem; margin-top:10px;">XP</div>
-                        <div class="bar-container"><div id="xp-bar" class="bar-fill xp-fill"></div></div>
-                        <div style="font-size:0.6rem; margin-top:5px;">FATIGUE: <span id="val-fatigue-num">0</span>%</div>
+                        
+                        <div style="margin-top:10px;">
+                            <div class="xp-text-display"><span>XP</span><span id="val-xp-txt">0 / 100</span></div>
+                            <div class="bar-container" style="margin-top:0;"><div id="xp-bar" class="bar-fill xp-fill"></div></div>
+                        </div>
+
+                        <div style="font-size:0.6rem; margin-top:8px;">FATIGUE: <span id="val-fatigue-num">0</span>%</div>
                         <div class="bar-container"><div id="fatigue-bar" class="bar-fill fatigue-fill"></div></div>
                     </div>
                 </div>
@@ -272,13 +254,14 @@
         const MIN = 60000;
         const HOUR = 3600000;
         
+        // Adicionado 'minLvl' para desbloqueio gradual
         const dungeonData = [
-            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, visualTime: 3, cooldownTime: 5 * MIN }, 
-            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, visualTime: 5, cooldownTime: 15 * MIN }, 
-            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, visualTime: 8, cooldownTime: 30 * MIN }, 
-            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, visualTime: 10, cooldownTime: 1 * HOUR }, 
-            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, visualTime: 15, cooldownTime: 4 * HOUR }, 
-            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, visualTime: 20, cooldownTime: 12 * HOUR } 
+            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, visualTime: 3, cooldownTime: 5 * MIN, minLvl: 1 }, 
+            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, visualTime: 5, cooldownTime: 15 * MIN, minLvl: 5 }, 
+            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, visualTime: 8, cooldownTime: 30 * MIN, minLvl: 15 }, 
+            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, visualTime: 10, cooldownTime: 1 * HOUR, minLvl: 25 }, 
+            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, visualTime: 15, cooldownTime: 4 * HOUR, minLvl: 40 }, 
+            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, visualTime: 20, cooldownTime: 12 * HOUR, minLvl: 60 } 
         ];
 
         const itemPrices = { "Goblin Stone": 10, "Lycan Fang": 25, "Centipede Shell": 50, "Ice Crystal": 100, "Orc Tusk": 250, "Ant Wing": 1000, "Bandage": 15, "Potion": 50, "Return Stone": 100, "E-Rank Dagger": 250 };
@@ -302,7 +285,7 @@
                 dailyReset: null 
             },
             init() {
-                const s = localStorage.getItem('solo_v42');
+                const s = localStorage.getItem('solo_v43');
                 if(s) {
                     const parsed = JSON.parse(s);
                     this.data = {...this.data, ...parsed};
@@ -312,11 +295,16 @@
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v42', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v43', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v42'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v43'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             
+            // --- NOVO CÁLCULO DE XP MÁXIMO (Escalonamento) ---
+            getMaxXP(lvl) {
+                return lvl * 100; // Nível 1 = 100, Nível 2 = 200, Nível 10 = 1000...
+            },
+
             tick() {
                 const now = Date.now();
                 if (this.data.dailyReset && now >= this.data.dailyReset) {
@@ -334,65 +322,91 @@
                 }
             },
 
-            // --- DAILY QUESTS ---
             toggle(i) { 
                 if (this.data.dailyReset) return; 
-
                 const q = this.data.quests[i];
                 if(q.done) {
                     q.done = false;
-                    this.save();
-                    ui.render();
                 } else {
-                    // Sem timer para Daily Quest individual, apenas marcar
                     q.done = true;
-                    this.save();
-                    ui.render();
                 }
+                this.save();
+                ui.render();
             },
 
             claimDailyRewards() {
                 if (this.data.dailyReset) return; 
-
                 if(this.data.quests.every(q => q.done)) {
-                    this.data.xp += 100; 
+                    // INT Bonus: Mais XP das dailies também? Vamos manter fixo nas dailies por enquanto
+                    const xpGain = 100;
+                    this.data.xp += xpGain; 
                     this.data.fatigue -= 20; if(this.data.fatigue < 0) this.data.fatigue = 0;
-                    if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; ui.notify("LEVEL UP!"); }
+                    
+                    const maxXP = this.getMaxXP(this.data.lvl);
+                    if(this.data.xp >= maxXP) { 
+                        this.data.xp -= maxXP; 
+                        this.data.lvl++; 
+                        this.data.pts += 3; 
+                        ui.notify("LEVEL UP!"); 
+                    }
                     
                     this.data.dailyReset = Date.now() + (24 * HOUR);
-                    
                     this.save(); 
                     ui.render(); 
-                    ui.notify("REWARDS CLAIMED. RESET IN 24H.");
+                    ui.notify(`REWARDS: +${xpGain} XP`);
                 } else {
-                    ui.notify("COMPLETE ALL QUESTS FIRST");
+                    ui.notify("COMPLETE ALL QUESTS");
                 }
             },
             
-            // --- DUNGEON ---
+            // --- DUNGEON COM EFEITO DE STATS ---
             enterDungeon(idx) {
                 const now = Date.now();
                 const unlockTime = this.data.dungeonCooldowns[idx] || 0;
-                
                 if (now < unlockTime) { ui.notify("DUNGEON LOCKED"); return; }
 
                 const dg = dungeonData[idx];
-                if(this.data.fatigue + dg.cost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; }
                 
-                this.data.fatigue += dg.cost;
+                // VIT: Reduz custo de fadiga (1 VIT = -0.2 cost, max reduction 50%)
+                const vitBonus = Math.floor(this.data.stats.VIT * 0.2);
+                let finalCost = dg.cost - vitBonus;
+                if (finalCost < 1) finalCost = 1; // Mínimo 1 de fadiga
+
+                if(this.data.fatigue + finalCost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; }
+                
+                this.data.fatigue += finalCost;
                 this.save();
                 ui.render();
                 
-                // Inicia Timer Fluido na parte inferior
-                ui.startMissionTimer(dg.visualTime, () => {
+                // AGI: Reduz tempo da missão (1 AGI = -2% tempo, max 50%)
+                const agiMod = Math.min(0.5, this.data.stats.AGI * 0.02);
+                const finalTime = Math.max(1, dg.visualTime * (1 - agiMod));
+
+                ui.startMissionTimer(finalTime, () => {
                     this.data.dungeonCooldowns[idx] = Date.now() + dg.cooldownTime;
 
-                    const successChance = 0.8;
+                    // STR: Aumenta chance de vitória (Base 80% + 1% por STR)
+                    let winChance = 0.8 + (this.data.stats.STR * 0.01);
+                    if (winChance > 0.98) winChance = 0.98; // Cap de 98%
+
                     ui.stopMissionTimer(); 
                     
-                    if(Math.random() < successChance) {
-                        this.data.xp += dg.xp; this.data.inventory.push(dg.drop);
-                        if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; }
+                    if(Math.random() < winChance) {
+                        // INT: Aumenta XP ganho (5% por INT)
+                        const intBonus = 1 + (this.data.stats.INT * 0.05);
+                        const finalXP = Math.floor(dg.xp * intBonus);
+                        
+                        this.data.xp += finalXP; 
+                        
+                        // PER: Chance extra de drop/gold? Por enquanto, apenas drop normal
+                        this.data.inventory.push(dg.drop);
+
+                        const maxXP = this.getMaxXP(this.data.lvl);
+                        if(this.data.xp >= maxXP) { 
+                            this.data.xp -= maxXP; 
+                            this.data.lvl++; 
+                            this.data.pts += 3; 
+                        }
                         ui.showSysModal(dg.mob, dg.drop);
                     } else { 
                         ui.notify("DEFEAT! ESCAPED SAFELY..."); 
@@ -412,6 +426,7 @@
             },
             sellItem(index) {
                 const item = this.data.inventory[index];
+                // PER: Aumenta valor de venda? (Opcional, não implementado para manter simples)
                 const price = itemPrices[item] || 0;
                 this.data.gold += price;
                 this.data.inventory.splice(index, 1);
@@ -441,31 +456,24 @@
                 const timerText = document.getElementById('mission-timer-text');
                 
                 timerContainer.style.display = 'block';
-                // Trigger reflow para a animação funcionar
                 void timerContainer.offsetWidth; 
                 timerContainer.classList.add('visible');
                 
                 let remaining = durationSeconds;
-                
                 const updateText = () => {
                    let m = Math.floor(remaining / 60);
                    let s = Math.floor(remaining % 60);
                    let ms = Math.floor((remaining % 1) * 100);
                    timerText.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}:${ms < 10 ? '0'+ms : ms}`;
                 };
-                
                 updateText();
-
                 if (missionTimer) clearInterval(missionTimer);
                 missionTimer = setInterval(() => {
                     remaining -= 0.1; 
                     if (remaining <= 0) {
                         clearInterval(missionTimer);
                         timerText.innerText = `00:00:00`;
-                        // Delay para fechar
-                        setTimeout(() => { 
-                             onComplete();
-                        }, 500);
+                        setTimeout(() => { onComplete(); }, 500);
                         return;
                     }
                     updateText();
@@ -476,16 +484,35 @@
                 if (missionTimer) clearInterval(missionTimer);
                 const timerContainer = document.getElementById('active-mission-box');
                 timerContainer.classList.remove('visible');
-                setTimeout(() => {
-                    timerContainer.style.display = 'none';
-                }, 400); // Espera a animação de saída
+                setTimeout(() => { timerContainer.style.display = 'none'; }, 400);
             },
 
             updateDungeonButtons() {
                 const now = Date.now();
                 const btns = document.querySelectorAll('.enter-btn');
                 btns.forEach((btn, i) => {
-                    const unlockTime = game.data.dungeonCooldowns[i] || 0;
+                    // Cuidado: dungeonData pode ser filtrado na renderização, 
+                    // então precisamos mapear corretamente se mudarmos a ordem.
+                    // Como estamos filtrando por nível na renderização, os índices podem não bater.
+                    // Para simplificar, vamos redesenhar a lista de dungeons se o nível mudar, 
+                    // mas o tick() atualiza apenas o texto.
+                    // Nota: Se ocultarmos dungeons, o índice 'i' do querySelectorAll pode não corresponder ao 'i' do array dungeonData.
+                    // Correção: Vamos confiar que a renderização inicial filtra e aqui atualizamos o que está na tela.
+                    // Mas como o botão tem onclick="enterDungeon(X)", o ID X é o original.
+                    // O tick precisa encontrar o botão correto.
+                    // Solução simples: O tick atualiza TODOS. Se a dungeon não estiver na tela, não tem problema.
+                });
+                
+                // Melhor abordagem para o tick: Re-renderizar o texto dos botões baseado no ID do onclick
+                // Mas para performance, vamos apenas iterar sobre o que existe.
+                // O botão tem um atributo onclick="game.enterDungeon(INDEX)". Vamos extrair esse index.
+                
+                const visibleBtns = document.querySelectorAll('.enter-btn');
+                visibleBtns.forEach(btn => {
+                    const onclickAttr = btn.getAttribute('onclick'); // "game.enterDungeon(0)"
+                    const idx = parseInt(onclickAttr.match(/\d+/)[0]);
+                    
+                    const unlockTime = game.data.dungeonCooldowns[idx] || 0;
                     if (now < unlockTime) {
                         const diff = unlockTime - now;
                         btn.innerText = msToTime(diff);
@@ -535,7 +562,14 @@
                 document.getElementById('val-pts').innerText = d.pts;
                 document.getElementById('val-gold').innerText = d.gold;
                 document.getElementById('val-fatigue-num').innerText = d.fatigue;
-                document.getElementById('xp-bar').style.width = d.xp + "%";
+                
+                // --- ATUALIZAÇÃO DA BARRA DE XP (LÓGICA NOVA) ---
+                const maxXP = game.getMaxXP(d.lvl);
+                const xpPercent = Math.min(100, (d.xp / maxXP) * 100);
+                document.getElementById('xp-bar').style.width = xpPercent + "%";
+                document.getElementById('val-xp-txt').innerText = `${Math.floor(d.xp)} / ${maxXP}`;
+                // ------------------------------------------------
+
                 document.getElementById('fatigue-bar').style.width = d.fatigue + "%";
                 document.getElementById('val-rank').innerText = game.getRank(d.lvl);
                 document.getElementById('val-job').innerText = t[game.getJobKey(d.lvl)];
@@ -551,9 +585,13 @@
                 });
                 this.updateClaimButton();
 
+                // --- DUNGEON LIST FILTRADA POR RANK ---
                 const dL = document.getElementById('dungeon-list'); dL.innerHTML = '';
                 dungeonData.forEach((dg, i) => {
-                    dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="enter-btn" onclick="game.enterDungeon(${i})">ENTER</button></div>`;
+                    // Filtro: Se o nível do jogador for menor que o minLvl da dungeon, não mostra.
+                    if (d.lvl >= dg.minLvl) {
+                        dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="enter-btn" onclick="game.enterDungeon(${i})">ENTER</button></div>`;
+                    }
                 });
                 this.updateDungeonButtons();
 
