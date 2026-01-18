@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V29</title>
+    <title>SYSTEM V30</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -11,44 +11,29 @@
             --glow: 0 0 10px #00eaff; 
             --bg: #02050a; 
             --red: #ff3333; 
-            
-            /* PALETA FIEL AO MANHWA (NEON CYANO INTENSO) */
-            --manhwa-cyan: #00f7ff; /* O azul elétrico */
-            --manhwa-core-white: #ffffff; /* O centro branco brilhante */
-            
-            /* Brilho do número: Núcleo branco, halo azul forte */
-            --gold-num-glow: 
-                0 0 2px var(--manhwa-core-white),
-                0 0 8px var(--manhwa-cyan),
-                0 0 15px var(--manhwa-cyan);
-            
-            /* Brilho do ícone G: Borda e letra brilhando em azul */
-            --gold-icon-box-glow: 0 0 8px var(--manhwa-cyan), inset 0 0 3px var(--manhwa-cyan);
-            --gold-icon-text-glow: 0 0 4px #fff, 0 0 8px var(--manhwa-cyan);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
         body { background: var(--bg); color: #fff; font-family: 'Chakra Petch', sans-serif; min-height: 100vh; padding: 15px; padding-bottom: 90px; }
 
-        /* --- ESTILO DO GOLD (FIEL AO MANHWA) --- */
+        /* --- ESTILO DO GOLD (CONSISTÊNCIA COM STATUS) --- */
         
-        /* Wrapper para manter alinhado */
         .gold-wrapper {
             display: inline-flex;
             align-items: baseline;
         }
 
-        /* O Número (Branco com halo azul intenso) */
+        /* O Número: Igual aos Stats (Branco com Glow Azul Sistema) */
         .gold-num {
-            color: var(--manhwa-core-white);
+            color: #fff;
             font-family: 'Chakra Petch', sans-serif;
-            font-weight: 800; /* Extra bold para ficar igual a imagem */
-            text-shadow: var(--gold-num-glow);
+            font-weight: 700;
+            text-shadow: 0 0 8px var(--blue);
             letter-spacing: 1px;
             margin-right: 4px;
         }
 
-        /* O Ícone G (Círculo e Letra em Neon Azul) */
+        /* O Ícone G: Borda Branca, Letra Branca, Glow Azul Sistema */
         .gold-icon {
             display: inline-flex;
             align-items: center;
@@ -56,19 +41,23 @@
             width: 18px;
             height: 18px;
             
-            /* Borda Neon Azul */
-            border: 1.5px solid var(--manhwa-cyan); 
+            /* Borda Branca */
+            border: 1.5px solid #fff; 
             border-radius: 50%;
-            box-shadow: var(--gold-icon-box-glow); /* Brilho da borda */
             
-            /* Letra Neon Azul com núcleo branco */
-            color: var(--manhwa-cyan);
+            /* Glow Azul na borda */
+            box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue);
+            
+            /* Letra Branca */
+            color: #fff;
             font-size: 0.7rem;
             font-weight: 800;
-            text-shadow: var(--gold-icon-text-glow); /* Brilho da letra */
+            
+            /* Glow Azul na letra */
+            text-shadow: 0 0 5px var(--blue);
             
             position: relative;
-            top: -1px; /* Ajuste fino de alinhamento */
+            top: -1px;
         }
 
         /* MOLDURA PRINCIPAL */
@@ -134,7 +123,7 @@
         .item-card { border: 1px solid var(--blue); background: rgba(0,234,255,0.05); padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .item-btn-group { display: flex; gap: 5px; }
         .use-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
-        .sell-btn { border: 1px solid var(--manhwa-cyan); color: var(--manhwa-cyan); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; text-shadow: 0 0 5px var(--manhwa-cyan); }
+        .sell-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; text-shadow: 0 0 5px var(--blue); }
 
         /* NAV */
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #02050a; border-top: 2px solid #fff; display: flex; justify-content: space-around; padding: 15px 0; z-index: 100; }
@@ -264,14 +253,14 @@
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v29');
+                const s = localStorage.getItem('solo_v30');
                 if(s) this.data = JSON.parse(s);
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v29', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v30', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v29'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v30'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             tick() {
                 const n = new Date(); const e = new Date(); e.setHours(23,59,59);
@@ -373,7 +362,7 @@
                 const iL = document.getElementById('inv-list');
                 if(d.inventory.length === 0) iL.innerHTML = `<div style="color:#444;text-align:center;">${t.empty}</div>`;
                 else iL.innerHTML = d.inventory.map((item, index) => `
-                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--manhwa-cyan);color:var(--manhwa-cyan);background:none;padding:2px 5px;font-size:0.7rem;text-shadow:0 0 5px var(--manhwa-cyan);">${t.sell}</button></div></div>`).join('');
+                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;text-shadow:0 0 5px var(--blue);">${t.sell}</button></div></div>`).join('');
             }
         };
         game.init();
