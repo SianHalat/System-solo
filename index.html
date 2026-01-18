@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V36 - Gold Box</title>
+    <title>SYSTEM V37 - Final Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -30,12 +30,12 @@
             min-height: 100vh; 
             padding: 15px; 
             padding-bottom: 90px; 
-            display: flex;             /* Flex para centralizar o layout global */
+            display: flex;             
             flex-direction: column;
             align-items: center;
         }
 
-        /* CONTAINER CENTRAL (Mantém o Status e o Gold alinhados) */
+        /* CONTAINER CENTRAL */
         .layout-wrapper {
             width: 100%;
             max-width: 500px;
@@ -57,13 +57,16 @@
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
 
-        /* --- NOVA CAIXA DE GOLD (ABAIXO DO STATUS) --- */
+        /* --- CAIXA DE GOLD (ABAIXO DO STATUS) --- */
         #gold-container-wrapper {
             width: 100%;
-            display: flex;
-            justify-content: flex-end; /* Alinha à direita */
-            margin-top: 8px; /* Espaço entre o Status e o Gold */
-            display: none; /* Controlado pelo JS */
+            display: flex; /* Flex para alinhar, mas controlado pelo JS para aparecer/sumir */
+            justify-content: flex-end; 
+            margin-top: 8px; 
+            /* Importante: Mantemos display flex aqui no CSS base ou none? 
+               Vamos deixar o JS controlar isso para evitar piscar na tela errada.
+               Começa oculto e o JS ativa no init() */
+            display: none; 
         }
 
         .gold-box-frame {
@@ -71,13 +74,12 @@
             background: rgba(2, 8, 20, 0.9);
             backdrop-filter: blur(4px);
             box-shadow: var(--glow);
-            padding: 5px 20px; /* Fino (pouco padding vertical) */
+            padding: 5px 20px; 
             display: flex;
             align-items: center;
             gap: 15px;
             position: relative;
         }
-        /* Detalhes de canto na caixa de Gold também */
         .gold-box-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 6px; height: 6px; border-top: 2px solid #fff; border-left: 2px solid #fff; }
         .gold-box-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 6px; height: 6px; border-bottom: 2px solid #fff; border-right: 2px solid #fff; }
 
@@ -183,6 +185,7 @@
             
             <div class="top-right-stack">
                 <div id="ui-kebab"><button class="kebab-btn" onclick="ui.toggleSettings()"></button></div>
+                
                 <div id="ui-pts" class="res-row">
                     <span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="sys-num-unified">0</span>
                 </div>
@@ -274,14 +277,15 @@
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v36');
+                const s = localStorage.getItem('solo_v37');
                 if(s) this.data = JSON.parse(s);
+                ui.tab('status'); // CORREÇÃO DO BUG: Força atualização da UI na inicialização
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v36', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v37', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v36'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v37'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             tick() {
                 const n = new Date(); const e = new Date(); e.setHours(23,59,59);
@@ -338,15 +342,15 @@
                 // Lógica de visibilidade
                 if (n === 'status') { 
                     els.timer.style.opacity = '1'; els.kebab.style.display = 'flex'; els.pts.style.display = 'flex'; 
-                    els.goldBox.style.display = 'flex'; // Mostra a caixa de Ouro nova
+                    els.goldBox.style.display = 'flex'; 
                 }
                 else if (n === 'shop') { 
                     els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
-                    els.goldBox.style.display = 'flex'; // Mostra Ouro no Shop também
+                    els.goldBox.style.display = 'flex'; 
                 }
                 else { 
                     els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.pts.style.display = 'none'; 
-                    els.goldBox.style.display = 'none'; // Esconde nas outras
+                    els.goldBox.style.display = 'none'; 
                 }
 
                 document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
