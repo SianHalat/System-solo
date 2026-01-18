@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V34 - Digital Grid</title>
+    <title>SYSTEM V35 - Alignment</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -18,26 +18,13 @@
         
         /* --- PLANO DE FUNDO GRID DIGITAL --- */
         body { 
-            /* Cor de fundo base (Preto Azulado Profundo) */
             background-color: #02050a;
-            
-            /* Criação das Linhas do Grid via CSS */
             background-image: 
-                /* Vinheta (Sombra nos cantos para profundidade) */
                 radial-gradient(circle at 50% 50%, transparent 20%, #02050a 120%),
-                
-                /* Linhas Horizontais (Azul Neon Sutil - 8% de opacidade) */
                 linear-gradient(rgba(0, 234, 255, 0.08) 1px, transparent 1px),
-                
-                /* Linhas Verticais (Azul Neon Sutil - 8% de opacidade) */
                 linear-gradient(90deg, rgba(0, 234, 255, 0.08) 1px, transparent 1px);
-            
-            /* Tamanho dos quadrados do grid (30px x 30px) */
             background-size: 100% 100%, 30px 30px, 30px 30px;
-            
-            /* Fixa o fundo para ele não se mover ao rolar */
             background-attachment: fixed;
-            
             color: #fff; 
             font-family: 'Chakra Petch', sans-serif; 
             min-height: 100vh; 
@@ -47,38 +34,91 @@
 
         /* MOLDURA PRINCIPAL */
         .main-frame { 
-            width: 100%; 
-            max-width: 500px; 
-            border: 2px solid #fff; 
-            padding: 25px; 
-            /* Fundo levemente transparente para ver o grid atrás */
-            background: rgba(2, 8, 20, 0.9); 
-            position: relative; 
-            box-shadow: var(--glow); 
-            margin: 0 auto; 
-            padding-top: 20px;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            width: 100%; max-width: 500px; border: 2px solid #fff; padding: 25px; 
+            background: rgba(2, 8, 20, 0.9); position: relative; box-shadow: var(--glow); 
+            margin: 0 auto; padding-top: 20px;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         }
-
-        /* O restante do CSS permanece idêntico para manter a fidelidade dos textos/ícones */
-        .sys-glow-text { color: #fff !important; text-shadow: var(--sys-text-glow); font-weight: 700; }
-        .gold-wrapper { display: inline-flex; align-items: baseline; }
-        .gold-num { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-shadow: var(--sys-text-glow); letter-spacing: 1px; margin-right: 4px; }
-        .gold-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1.5px solid #fff; border-radius: 50%; box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); color: #fff; font-size: 0.7rem; font-weight: 800; text-shadow: 0 0 5px var(--blue); position: relative; top: -1px; }
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
+
+        /* UI TOPO */
         #ui-timer-container { position: absolute; top: 25px; left: 25px; z-index: 50; transition: opacity 0.3s ease; }
         .timer { font-size: 1rem; font-weight: bold; color: #fff; text-shadow: var(--sys-text-glow); }
-        .top-right-stack { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 50; }
+
+        /* --- STACK DO TOPO DIREITO (AJUSTADO) --- */
+        .top-right-stack { 
+            position: absolute; 
+            top: 30px; /* Levemente mais para baixo */
+            right: 25px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            gap: 5px; /* Espaço padrão entre linhas */
+            z-index: 50; 
+        }
+
+        /* BOTÃO KEBAB (TRÊS PONTINHOS) - AGORA BRANCO COM GLOW AZUL */
+        .kebab-row {
+            margin-bottom: 15px; /* Mais espaço entre o botão e o dinheiro */
+        }
         .kebab-btn { width: 20px; height: 20px; position: relative; background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        .kebab-btn::before { content: ''; width: 4px; height: 4px; background: var(--blue); border-radius: 50%; box-shadow: 0 -7px 0 var(--blue), 0 7px 0 var(--blue); filter: drop-shadow(0 0 2px var(--blue)); }
-        .res-row { font-size: 0.8rem; color: #8899aa; display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
-        .res-val-blue { color: #fff; font-weight: bold; font-size: 1.1rem; text-shadow: var(--sys-text-glow); }
+        .kebab-btn::before { 
+            content: ''; 
+            width: 4px; height: 4px; 
+            border-radius: 50%; 
+            
+            /* Ponto Central Branco */
+            background: #fff; 
+            
+            /* Pontos Superior/Inferior Brancos */
+            box-shadow: 0 -7px 0 #fff, 0 7px 0 #fff; 
+            
+            /* Glow Azul no conjunto todo */
+            filter: drop-shadow(0 0 3px var(--blue)); 
+        }
+
+        /* LINHAS DE RECURSOS (GOLD / POINTS) */
+        .res-row { 
+            font-size: 0.8rem; 
+            color: #8899aa; 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; /* Alinha texto e número verticalmente */
+            justify-content: flex-end; 
+            height: 24px; /* Altura fixa para alinhar melhor */
+        }
+
+        /* CLASSE UNIFICADA PARA NÚMEROS (GOLD E POINTS IGUAIS) */
+        .sys-num-unified {
+            color: #fff;
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem; /* Tamanho unificado para ambos */
+            text-shadow: var(--sys-text-glow);
+            letter-spacing: 1px;
+        }
+
+        /* Ícone G ajustado */
+        .gold-wrapper { display: inline-flex; align-items: center; }
+        .gold-icon { 
+            display: inline-flex; align-items: center; justify-content: center; 
+            width: 18px; height: 18px; 
+            border: 1.5px solid #fff; border-radius: 50%; 
+            box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); 
+            color: #fff; font-size: 0.7rem; font-weight: 800; 
+            text-shadow: 0 0 5px var(--blue); 
+            margin-left: 5px;
+            position: relative; top: -1px;
+        }
+
+        /* ANIMAÇÕES & OUTROS */
         @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes sys-open { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
         .content { display: none; }
         .content.active { display: block; animation: system-fade 0.4s ease; }
+
+        /* STATUS */
         h2.tab-title { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--blue); margin-bottom: 30px; font-size: 1.8rem; margin-top: 10px; }
         .header-grid { display: grid; grid-template-columns: auto 1fr; gap: 25px; align-items: end; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 20px; margin-bottom: 20px; }
         .lvl-num { font-size: 4.5rem; font-weight: 700; text-shadow: 0 0 15px #fff; line-height: 0.8; }
@@ -86,14 +126,20 @@
         .info-row { font-size: 0.85rem; color: #888; display: flex; align-items: center; margin-bottom: 4px; }
         .info-val { color: #fff; font-weight: bold; text-transform: uppercase; text-shadow: var(--sys-text-glow); }
         .rank-box { color: #fff; border: 1px solid var(--blue); padding: 0 5px; margin-left: 5px; font-weight: bold; text-shadow: var(--sys-text-glow); box-shadow: 0 0 5px rgba(0, 234, 255, 0.3); }
+        
+        /* BARRAS */
         .bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
         .xp-fill { background: #fff; box-shadow: 0 0 10px #fff; }
         .fatigue-fill { background: #ff3333; box-shadow: 0 0 10px #ff3333; }
+
+        /* STATS LIST */
         .stat-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 8px; }
         .stat-label { font-size: 1.2rem; font-weight: 600; color: #ccc; width: 50px; }
         .stat-val { font-size: 1.6rem; font-weight: 700; margin-left: 10px; color: #fff; text-shadow: var(--sys-text-glow); }
         .plus-btn { width: 24px; height: 24px; border: 1px solid var(--blue); margin-left: auto; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--blue); }
+
+        /* GERAL */
         .quest-item, .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
         .quest-reward { color: #888; font-size: 0.7rem; margin-left: 10px; }
         .mon-white { color: #fff; text-shadow: 0 0 5px #fff; }
@@ -143,17 +189,17 @@
         <div id="ui-timer-container"><div id="timer" class="timer">00:00:00</div></div>
         
         <div class="top-right-stack">
-            <div id="ui-kebab"><button class="kebab-btn" onclick="ui.toggleSettings()"></button></div>
+            <div id="ui-kebab" class="kebab-row"><button class="kebab-btn" onclick="ui.toggleSettings()"></button></div>
             
             <div id="ui-gold" class="res-row">
                 <span id="txt-gold-lbl">GOLD:</span> 
                 <span class="gold-wrapper">
-                    <span id="val-gold" class="gold-num">0</span><span class="gold-icon">G</span>
+                    <span id="val-gold" class="sys-num-unified">0</span><span class="gold-icon">G</span>
                 </span>
             </div>
             
             <div id="ui-pts" class="res-row">
-                <span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="res-val-blue">0</span>
+                <span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="sys-num-unified">0</span>
             </div>
         </div>
 
@@ -194,10 +240,10 @@
         <div id="tab-shop" class="content">
             <h2 id="txt-shop" class="tab-title">SHOP</h2>
             <div class="shop-grid">
-                <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span class="gold-wrapper"><span class="gold-num">30</span><span class="gold-icon">G</span></span><br><small>-10 Fatigue</small></div>
-                <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span class="gold-wrapper"><span class="gold-num">100</span><span class="gold-icon">G</span></span><br><small>-40 Fatigue</small></div>
-                <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span class="gold-wrapper"><span class="gold-num">200</span><span class="gold-icon">G</span></span></div>
-                <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span class="gold-wrapper"><span class="gold-num">500</span><span class="gold-icon">G</span></span></div>
+                <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span class="gold-wrapper"><span class="sys-num-unified">30</span><span class="gold-icon">G</span></span><br><small>-10 Fatigue</small></div>
+                <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span class="gold-wrapper"><span class="sys-num-unified">100</span><span class="gold-icon">G</span></span><br><small>-40 Fatigue</small></div>
+                <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span class="gold-wrapper"><span class="sys-num-unified">200</span><span class="gold-icon">G</span></span></div>
+                <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span class="gold-wrapper"><span class="sys-num-unified">500</span><span class="gold-icon">G</span></span></div>
             </div>
             <h3 style="margin-top:25px; border-bottom:1px solid #333;" id="txt-inv">INVENTORY</h3>
             <div id="inv-list" style="padding-top:10px;"></div>
@@ -232,14 +278,14 @@
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v34');
+                const s = localStorage.getItem('solo_v35');
                 if(s) this.data = JSON.parse(s);
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v34', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v35', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v34'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v35'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             tick() {
                 const n = new Date(); const e = new Date(); e.setHours(23,59,59);
