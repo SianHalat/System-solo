@@ -3,10 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V24</title>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <title>SYSTEM V25</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
-        :root { --blue: #00eaff; --glow: 0 0 10px #00eaff; --bg: #02050a; --gold: #ffaa00; --red: #ff3333; }
+        /* AQUI ESTÁ A MUDANÇA DA COR DO OURO */
+        :root { 
+            --blue: #00eaff; 
+            --glow: 0 0 10px #00eaff; 
+            --bg: #02050a; 
+            --gold: #FFB938; /* Cor exata do Ouro baseada na interface */
+            --gold-glow: 0 0 8px rgba(255, 185, 56, 0.6); /* Brilho do ouro */
+            --red: #ff3333; 
+        }
+
         body.lang-cjk { font-family: 'Noto Sans SC', 'Noto Sans JP', sans-serif !important; }
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
         body { background: var(--bg); color: #fff; font-family: 'Chakra Petch', sans-serif; min-height: 100vh; padding: 15px; padding-bottom: 90px; }
@@ -16,7 +25,7 @@
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
 
-        /* UI FLUTUANTE (DINÂMICA) */
+        /* UI FLUTUANTE */
         #ui-timer-container { position: absolute; top: 25px; left: 25px; z-index: 50; transition: opacity 0.3s ease; }
         .timer { font-size: 1rem; font-weight: bold; color: var(--blue); text-shadow: 0 0 5px var(--blue); }
 
@@ -25,9 +34,23 @@
         .kebab-btn { width: 20px; height: 20px; position: relative; background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .kebab-btn::before { content: ''; width: 4px; height: 4px; background: var(--blue); border-radius: 50%; box-shadow: 0 -7px 0 var(--blue), 0 7px 0 var(--blue); filter: drop-shadow(0 0 2px var(--blue)); }
 
+        /* RECURSOS LISTA (ATUALIZADO PARA OURO) */
         .res-row { font-size: 0.8rem; color: #aaa; letter-spacing: 1px; display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
         .res-val { color: var(--blue); font-weight: bold; font-size: 1.1rem; text-shadow: 0 0 5px var(--blue); }
-        .res-gold-txt { color: var(--gold); text-shadow: 0 0 5px rgba(255, 170, 0, 0.5); }
+        
+        /* ESTILO ESPECÍFICO DO OURO (NUMERO E LETRA G) */
+        .res-gold-txt { 
+            color: var(--gold); 
+            text-shadow: var(--gold-glow);
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 700; /* Negrito para ficar igual à imagem */
+            letter-spacing: 0.5px;
+        }
+        /* Estilo da letra G pequena ao lado do valor */
+        .gold-unit {
+            font-size: 0.8em; /* Levemente menor que o número */
+            margin-left: 2px;
+        }
 
         /* ANIMAÇÕES */
         @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); filter: blur(2px); } 100% { opacity: 1; transform: translateY(0); filter: blur(0); } }
@@ -59,18 +82,18 @@
 
         /* QUESTS & DUNGEONS */
         .quest-item, .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
-        .quest-reward { color: #888; font-size: 0.7rem; margin-left: 10px; } /* XP Only */
+        .quest-reward { color: #888; font-size: 0.7rem; margin-left: 10px; }
         .claim-btn { width: 100%; padding: 15px; margin-top: 20px; border: 1px solid var(--blue); color: var(--blue); background: rgba(0, 234, 255, 0.1); font-weight: bold; cursor: pointer; letter-spacing: 2px; box-shadow: var(--glow); display: none; }
         
         /* MONSTER COLORS */
         .mon-white { color: #fff; text-shadow: 0 0 5px #fff; }
-        .mon-orange { color: var(--gold); text-shadow: 0 0 5px var(--gold); }
+        .mon-orange { color: var(--gold); text-shadow: var(--gold-glow); }
         .mon-red { color: var(--red); text-shadow: 0 0 5px var(--red); }
         
         .enter-btn { border: 1px solid var(--red); color: var(--red); background: rgba(255, 50, 50, 0.1); padding: 5px 15px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
         .enter-btn:active { background: var(--red); color: #000; }
 
-        /* SYSTEM VICTORY MODAL (POPUP) */
+        /* SYSTEM VICTORY MODAL */
         #sys-modal { 
             position: absolute; top: 150px; left: 5%; width: 90%; 
             background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); 
@@ -129,7 +152,12 @@
 
         <div class="top-right-stack">
             <div id="ui-kebab" class="kebab-row"><button class="kebab-btn" onclick="ui.toggleSettings()"></button></div>
-            <div id="ui-gold" class="res-row"><span id="txt-gold-lbl">GOLD:</span> <span id="val-gold" class="res-val res-gold-txt">0</span></div>
+            <div id="ui-gold" class="res-row">
+                <span id="txt-gold-lbl">GOLD:</span> 
+                <span class="res-gold-txt">
+                    <span id="val-gold">0</span><span class="gold-unit">G</span>
+                </span>
+            </div>
             <div id="ui-pts" class="res-row"><span id="txt-pts-lbl">POINTS:</span> <span id="val-pts" class="res-val">0</span></div>
         </div>
 
@@ -171,10 +199,10 @@
         <div id="tab-shop" class="content">
             <h2 id="txt-shop" class="tab-title">SHOP</h2>
             <div class="shop-grid">
-                <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span style="color:orange">30G</span><br><small>-10 Fatigue</small></div>
-                <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span style="color:orange">100G</span><br><small>-40 Fatigue</small></div>
-                <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span style="color:orange">200G</span><br><small>Safety</small></div>
-                <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span style="color:orange">500G</span><br><small>ATK +10</small></div>
+                <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span style="color:var(--gold)">30G</span><br><small>-10 Fatigue</small></div>
+                <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span style="color:var(--gold)">100G</span><br><small>-40 Fatigue</small></div>
+                <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span style="color:var(--gold)">200G</span><br><small>Safety</small></div>
+                <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span style="color:var(--gold)">500G</span><br><small>ATK +10</small></div>
             </div>
             <h3 style="margin-top:25px; border-bottom:1px solid #333;" id="txt-inv">INVENTORY</h3>
             <div id="inv-list" style="padding-top:10px;"></div>
@@ -204,24 +232,19 @@
             { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90 }
         ];
 
-        // Tabela de Preços para Venda
-        const itemPrices = {
-            "Goblin Stone": 10, "Lycan Fang": 25, "Centipede Shell": 50,
-            "Ice Crystal": 100, "Orc Tusk": 250, "Ant Wing": 1000,
-            "Bandage": 15, "Potion": 50, "Return Stone": 100, "E-Rank Dagger": 250
-        };
+        const itemPrices = { "Goblin Stone": 10, "Lycan Fang": 25, "Centipede Shell": 50, "Ice Crystal": 100, "Orc Tusk": 250, "Ant Wing": 1000, "Bandage": 15, "Potion": 50, "Return Stone": 100, "E-Rank Dagger": 250 };
 
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v24');
+                const s = localStorage.getItem('solo_v25');
                 if(s) this.data = JSON.parse(s);
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v24', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v25', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v24'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v25'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             tick() {
                 const n = new Date(); const e = new Date(); e.setHours(23,59,59);
@@ -232,35 +255,22 @@
             toggle(i) { this.data.quests[i].done = !this.data.quests[i].done; this.save(); ui.render(); },
             claimDailyRewards() {
                 if(this.data.quests.every(q => q.done)) {
-                    this.data.xp += 100; // Apenas XP
-                    this.data.fatigue -= 20; // Daily Quests recuperam status (lógica do anime)
-                    if(this.data.fatigue < 0) this.data.fatigue = 0;
+                    this.data.xp += 100; this.data.fatigue -= 20; if(this.data.fatigue < 0) this.data.fatigue = 0;
                     if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; ui.notify("LEVEL UP!"); }
                     this.data.quests.forEach(q => q.done = false);
-                    this.save(); ui.render();
-                    ui.notify("REWARDS CLAIMED: XP +100");
+                    this.save(); ui.render(); ui.notify("REWARDS CLAIMED: XP +100");
                 }
             },
             enterDungeon(idx) {
                 const dg = dungeonData[idx];
                 if(this.data.fatigue + dg.cost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; }
-                
-                // Simples RNG de Combate (Baseado em Nível)
-                // Se Nível < Dificuldade "sugerida", chance de falha aumenta (simplificado aqui)
-                const successChance = 0.8; // 80% chance for now
-                
+                const successChance = 0.8; 
                 this.data.fatigue += dg.cost;
-                
                 if(Math.random() < successChance) {
-                    // Vitória
-                    this.data.xp += dg.xp;
-                    this.data.inventory.push(dg.drop);
+                    this.data.xp += dg.xp; this.data.inventory.push(dg.drop);
                     if(this.data.xp >= 100) { this.data.xp = 0; this.data.lvl++; this.data.pts += 3; }
-                    
                     ui.showSysModal(dg.mob, dg.drop);
-                } else {
-                    ui.notify("DEFEAT! ESCAPED SAFELY...");
-                }
+                } else { ui.notify("DEFEAT! ESCAPED SAFELY..."); }
                 this.save(); ui.render();
             },
             buy(n, c) { if(this.data.gold >= c) { this.data.gold -= c; this.data.inventory.push(n); this.save(); ui.render(); ui.notify("BOUGHT: " + n); } else { ui.notify("NOT ENOUGH GOLD"); } },
@@ -268,20 +278,14 @@
                 const item = this.data.inventory[index];
                 if(item === 'Bandage') { this.data.fatigue -= 10; ui.notify("FATIGUE -10"); }
                 else if(item === 'Potion') { this.data.fatigue -= 40; ui.notify("FATIGUE -40"); }
-                else if(itemPrices[item]) { ui.notify("CANNOT USE. SELL IT."); return; } // Loot items
-                
+                else if(itemPrices[item]) { ui.notify("CANNOT USE. SELL IT."); return; }
                 if(this.data.fatigue < 0) this.data.fatigue = 0;
-                this.data.inventory.splice(index, 1);
-                this.save(); ui.render();
+                this.data.inventory.splice(index, 1); this.save(); ui.render();
             },
             sellItem(index) {
                 const item = this.data.inventory[index];
                 const price = itemPrices[item] || 0;
-                if(price > 0) {
-                    this.data.gold += price;
-                    this.data.inventory.splice(index, 1);
-                    this.save(); ui.render(); ui.notify(`SOLD: +${price}G`);
-                }
+                if(price > 0) { this.data.gold += price; this.data.inventory.splice(index, 1); this.save(); ui.render(); ui.notify(`SOLD: +${price}G`); }
             },
             getRank(l) { if(l<=3) return 'E'; if(l<=8) return 'D'; if(l<=19) return 'C'; if(l<=39) return 'B'; if(l<=59) return 'A'; if(l<=69) return 'S'; if(l<=89) return 'SS'; return 'SSS'; },
             getJobKey(l) { if(l < 40) return 'j0'; if(l < 80) return 'j2'; if(l < 100) return 'j3'; return 'j4'; },
@@ -294,7 +298,6 @@
                 if (n === 'status') { els.timer.style.opacity = '1'; els.kebab.style.display = 'flex'; els.gold.style.display = 'flex'; els.pts.style.display = 'flex'; }
                 else if (n === 'quests' || n === 'dungeon') { els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.gold.style.display = 'none'; els.pts.style.display = 'none'; }
                 else if (n === 'shop') { els.timer.style.opacity = '0'; els.kebab.style.display = 'none'; els.gold.style.display = 'flex'; els.pts.style.display = 'none'; }
-
                 document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 document.getElementById('tab-' + n).classList.add('active');
@@ -335,7 +338,6 @@
                 
                 for(let k in d.stats) document.getElementById('val-'+k).innerText = d.stats[k];
                 
-                // Quests (XP only)
                 const qL = document.getElementById('q-list'); qL.innerHTML = '';
                 let allDone = true;
                 d.quests.forEach((q, i) => {
@@ -344,32 +346,18 @@
                 });
                 document.getElementById('btn-claim').style.display = allDone ? 'block' : 'none';
 
-                // Dungeons
                 const dL = document.getElementById('dungeon-list'); dL.innerHTML = '';
                 dungeonData.forEach((dg, i) => {
                     dL.innerHTML += `<div class="dungeon-item">
-                        <div>
-                            <div style="font-weight:bold;">${dg.name}</div>
-                            <div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div>
-                        </div>
-                        <div style="text-align:right;">
-                             <div style="font-size:0.7rem; color:#aaa;">Cost: ${dg.cost} FATIGUE</div>
-                             <button class="enter-btn" onclick="game.enterDungeon(${i})">ENTER</button>
-                        </div>
+                        <div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div>
+                        <div style="text-align:right;"><div style="font-size:0.7rem; color:#aaa;">Cost: ${dg.cost} FATIGUE</div><button class="enter-btn" onclick="game.enterDungeon(${i})">ENTER</button></div>
                     </div>`;
                 });
 
-                // Inventory (Use & Sell)
                 const iL = document.getElementById('inv-list');
                 if(d.inventory.length === 0) iL.innerHTML = `<div style="color:#444;text-align:center;">${t.empty}</div>`;
                 else iL.innerHTML = d.inventory.map((item, index) => `
-                    <div class="item-card">
-                        <span>${item}</span>
-                        <div class="item-btn-group">
-                            <button class="use-btn" onclick="game.useItem(${index})">${t.use}</button>
-                            <button class="sell-btn" onclick="game.sellItem(${index})">${t.sell}</button>
-                        </div>
-                    </div>`).join('');
+                    <div class="item-card"><span>${item}</span><div class="item-btn-group"><button class="use-btn" onclick="game.useItem(${index})">${t.use}</button><button class="sell-btn" onclick="game.sellItem(${index})">${t.sell}</button></div></div>`).join('');
                 
                 if(['zh','ja'].includes(d.lang)) document.getElementById('b').classList.add('lang-cjk'); else document.getElementById('b').classList.remove('lang-cjk');
             }
