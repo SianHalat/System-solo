@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V27</title>
+    <title>SYSTEM V29</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -12,47 +12,63 @@
             --bg: #02050a; 
             --red: #ff3333; 
             
-            /* NOVA PALETA DE OURO DO SISTEMA (Baseada na sua descrição) */
-            --sys-white: #ffffff;
-            --sys-cyan: #00eaff;
-            --sys-glow-layer: 
-                0 0 2px #fff,          /* Núcleo branco */
-                0 0 5px #00eaff,       /* Borda Ciano */
-                0 0 12px #0077ff;      /* Aura Azul Neon (Ghosting) */
+            /* PALETA FIEL AO MANHWA (NEON CYANO INTENSO) */
+            --manhwa-cyan: #00f7ff; /* O azul elétrico */
+            --manhwa-core-white: #ffffff; /* O centro branco brilhante */
+            
+            /* Brilho do número: Núcleo branco, halo azul forte */
+            --gold-num-glow: 
+                0 0 2px var(--manhwa-core-white),
+                0 0 8px var(--manhwa-cyan),
+                0 0 15px var(--manhwa-cyan);
+            
+            /* Brilho do ícone G: Borda e letra brilhando em azul */
+            --gold-icon-box-glow: 0 0 8px var(--manhwa-cyan), inset 0 0 3px var(--manhwa-cyan);
+            --gold-icon-text-glow: 0 0 4px #fff, 0 0 8px var(--manhwa-cyan);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
         body { background: var(--bg); color: #fff; font-family: 'Chakra Petch', sans-serif; min-height: 100vh; padding: 15px; padding-bottom: 90px; }
 
-        /* --- ESTILO DO GOLD (SISTEMA HOLOGRÁFICO) --- */
+        /* --- ESTILO DO GOLD (FIEL AO MANHWA) --- */
         
-        /* O Número */
-        .gold-num {
-            color: var(--sys-white);
-            font-family: 'Chakra Petch', sans-serif;
-            font-weight: 700;
-            text-shadow: var(--sys-glow-layer);
-            letter-spacing: 1px;
+        /* Wrapper para manter alinhado */
+        .gold-wrapper {
+            display: inline-flex;
+            align-items: baseline;
         }
 
-        /* O Ícone G (Círculo Neon) */
+        /* O Número (Branco com halo azul intenso) */
+        .gold-num {
+            color: var(--manhwa-core-white);
+            font-family: 'Chakra Petch', sans-serif;
+            font-weight: 800; /* Extra bold para ficar igual a imagem */
+            text-shadow: var(--gold-num-glow);
+            letter-spacing: 1px;
+            margin-right: 4px;
+        }
+
+        /* O Ícone G (Círculo e Letra em Neon Azul) */
         .gold-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             width: 18px;
             height: 18px;
-            border: 1.5px solid var(--sys-cyan);
+            
+            /* Borda Neon Azul */
+            border: 1.5px solid var(--manhwa-cyan); 
             border-radius: 50%;
-            color: var(--sys-cyan);
-            font-size: 0.65rem;
+            box-shadow: var(--gold-icon-box-glow); /* Brilho da borda */
+            
+            /* Letra Neon Azul com núcleo branco */
+            color: var(--manhwa-cyan);
+            font-size: 0.7rem;
             font-weight: 800;
-            margin-left: 4px;
-            box-shadow: 0 0 8px var(--sys-cyan), inset 0 0 4px var(--sys-cyan); /* Brilho dentro e fora */
-            text-shadow: 0 0 2px #fff;
-            vertical-align: middle;
+            text-shadow: var(--gold-icon-text-glow); /* Brilho da letra */
+            
             position: relative;
-            top: -2px;
+            top: -1px; /* Ajuste fino de alinhamento */
         }
 
         /* MOLDURA PRINCIPAL */
@@ -118,7 +134,7 @@
         .item-card { border: 1px solid var(--blue); background: rgba(0,234,255,0.05); padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .item-btn-group { display: flex; gap: 5px; }
         .use-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
-        .sell-btn { border: 1px solid var(--sys-cyan); color: var(--sys-cyan); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
+        .sell-btn { border: 1px solid var(--manhwa-cyan); color: var(--manhwa-cyan); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; text-shadow: 0 0 5px var(--manhwa-cyan); }
 
         /* NAV */
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #02050a; border-top: 2px solid #fff; display: flex; justify-content: space-around; padding: 15px 0; z-index: 100; }
@@ -163,7 +179,7 @@
             
             <div id="ui-gold" class="res-row">
                 <span id="txt-gold-lbl">GOLD:</span> 
-                <span>
+                <span class="gold-wrapper">
                     <span id="val-gold" class="gold-num">0</span><span class="gold-icon">G</span>
                 </span>
             </div>
@@ -210,10 +226,10 @@
         <div id="tab-shop" class="content">
             <h2 id="txt-shop" class="tab-title">SHOP</h2>
             <div class="shop-grid">
-                <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span><span class="gold-num">30</span><span class="gold-icon">G</span></span><br><small>-10 Fatigue</small></div>
-                <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span><span class="gold-num">100</span><span class="gold-icon">G</span></span><br><small>-40 Fatigue</small></div>
-                <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span><span class="gold-num">200</span><span class="gold-icon">G</span></span></div>
-                <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span><span class="gold-num">500</span><span class="gold-icon">G</span></span></div>
+                <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span class="gold-wrapper"><span class="gold-num">30</span><span class="gold-icon">G</span></span><br><small>-10 Fatigue</small></div>
+                <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span class="gold-wrapper"><span class="gold-num">100</span><span class="gold-icon">G</span></span><br><small>-40 Fatigue</small></div>
+                <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span class="gold-wrapper"><span class="gold-num">200</span><span class="gold-icon">G</span></span></div>
+                <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span class="gold-wrapper"><span class="gold-num">500</span><span class="gold-icon">G</span></span></div>
             </div>
             <h3 style="margin-top:25px; border-bottom:1px solid #333;" id="txt-inv">INVENTORY</h3>
             <div id="inv-list" style="padding-top:10px;"></div>
@@ -248,14 +264,14 @@
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v27');
+                const s = localStorage.getItem('solo_v29');
                 if(s) this.data = JSON.parse(s);
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v27', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v29', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v27'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v29'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             tick() {
                 const n = new Date(); const e = new Date(); e.setHours(23,59,59);
@@ -357,7 +373,7 @@
                 const iL = document.getElementById('inv-list');
                 if(d.inventory.length === 0) iL.innerHTML = `<div style="color:#444;text-align:center;">${t.empty}</div>`;
                 else iL.innerHTML = d.inventory.map((item, index) => `
-                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.sell}</button></div></div>`).join('');
+                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--manhwa-cyan);color:var(--manhwa-cyan);background:none;padding:2px 5px;font-size:0.7rem;text-shadow:0 0 5px var(--manhwa-cyan);">${t.sell}</button></div></div>`).join('');
             }
         };
         game.init();
