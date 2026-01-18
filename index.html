@@ -3,37 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V32</title>
+    <title>SYSTEM V33 - Anime Fidelity</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
             --blue: #00eaff; 
             --glow: 0 0 10px #00eaff; 
-            --bg: #02050a; /* Cor de fundo de fallback */
+            --bg: #02050a; 
             --red: #ff3333; 
             --sys-text-glow: 0 0 8px var(--blue);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
         
-        /* --- ATUALIZAÇÃO DO PLANO DE FUNDO --- */
+        /* --- PLANO DE FUNDO FIEL AO ANIME --- */
         body { 
-            /* Define a imagem de fundo */
-            background-image: url('https://i.imgur.com/0000000.png'); /* Substitua pelo URL real da imagem */
+            /* SUBSTITUA 'URL_DA_IMAGEM_AQUI' PELO LINK REAL DA SUA IMAGEM */
+            background-image: url('URL_DA_IMAGEM_AQUI');
             
-            /* Ajusta a imagem para cobrir toda a tela, mantendo a proporção */
+            /* Garante que a imagem cubra toda a tela sem distorcer */
             background-size: cover;
             
-            /* Centraliza a imagem */
+            /* Centraliza o foco da imagem */
             background-position: center center;
             
-            /* Impede que a imagem se repita */
+            /* Não repete a imagem */
             background-repeat: no-repeat;
             
-            /* Fixa o fundo para que ele não role com o conteúdo (opcional, mas comum em UIs assim) */
+            /* Fixa o fundo para um efeito de profundidade ao rolar a página */
             background-attachment: fixed;
             
-            /* Mantém a cor de fundo como fallback caso a imagem não carregue */
+            /* Cor de fundo de segurança caso a imagem não carregue */
             background-color: var(--bg);
             
             color: #fff; 
@@ -43,23 +43,27 @@
             padding-bottom: 90px; 
         }
 
-        /* MOLDURA PRINCIPAL (Ajuste de transparência para o novo fundo) */
+        /* MOLDURA PRINCIPAL - EFEITO VIDRO DO SISTEMA */
         .main-frame { 
             width: 100%; 
             max-width: 500px; 
             border: 2px solid #fff; 
             padding: 25px; 
-            /* Aumentei um pouco a transparência para o fundo holográfico aparecer mais */
-            background: rgba(2, 8, 15, 0.85); 
+            
+            /* Fundo escuro semi-transparente para ler o texto, mas ver o fundo */
+            background: rgba(2, 8, 20, 0.85); 
+            
             position: relative; 
             box-shadow: var(--glow); 
             margin: 0 auto; 
             padding-top: 20px;
-            /* Adicionei um leve backdrop-filter para um efeito de vidro fosco moderno */
-            backdrop-filter: blur(5px);
+            
+            /* Efeito de desfoque no fundo atrás da moldura (Vidro Fosco) */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); /* Para compatibilidade com Safari */
         }
 
-        /* Resto do CSS permanece o mesmo da V31... */
+        /* O restante do CSS da V31 permanece inalterado */
         .sys-glow-text { color: #fff !important; text-shadow: var(--sys-text-glow); font-weight: 700; }
         .gold-wrapper { display: inline-flex; align-items: baseline; }
         .gold-num { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-shadow: var(--sys-text-glow); letter-spacing: 1px; margin-right: 4px; }
