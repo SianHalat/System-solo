@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V44 - Instance Dungeon</title>
+    <title>SYSTEM V46 - The Player</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
             --blue: #00eaff; 
-            --purple: #bf00ff; /* Cor para Instâncias/Raridades Altas */
-            --glow: 0 0 10px #00eaff; 
-            --bg: #02050a; 
+            --purple: #bf00ff; 
+            --gold: #ffd700;
             --red: #ff3333; 
+            --green: #33ff33;
             --gray: #444;
+            --bg: #02050a;
             --sys-text-glow: 0 0 8px var(--blue);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
         
         body { 
-            background-color: #02050a;
+            background-color: var(--bg);
             background-image: 
                 radial-gradient(circle at 50% 50%, transparent 20%, #02050a 120%),
                 linear-gradient(rgba(0, 234, 255, 0.08) 1px, transparent 1px),
@@ -31,69 +32,93 @@
             min-height: 100vh; 
             padding: 15px; 
             padding-bottom: 90px; 
-            display: flex;             
-            flex-direction: column;
-            align-items: center;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden;
         }
+
+        /* OVERLAYS DE EFEITO */
+        #toxic-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9000; opacity: 0; transition: opacity 0.5s; mix-blend-mode: overlay; }
+        .toxic-red { background: radial-gradient(circle, transparent 50%, red 100%); animation: pulse-red 1s infinite; }
+        .detox-green { background: radial-gradient(circle, transparent 50%, var(--green) 100%); animation: pulse-green 1s ease-out; }
+
+        @keyframes pulse-red { 0% { opacity: 0.6; } 50% { opacity: 0.9; } 100% { opacity: 0.6; } }
+        @keyframes pulse-green { 0% { opacity: 0; } 50% { opacity: 0.8; } 100% { opacity: 0; } }
 
         .layout-wrapper { width: 100%; max-width: 500px; position: relative; }
 
         .main-frame { 
             width: 100%; border: 2px solid #fff; padding: 25px; 
-            background: rgba(2, 8, 20, 0.9); position: relative; box-shadow: var(--glow); 
+            background: rgba(2, 8, 20, 0.95); position: relative; box-shadow: var(--glow); 
             padding-top: 20px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 10;
-            min-height: 600px; display: flex; flex-direction: column; 
+            min-height: 650px; display: flex; flex-direction: column; 
         }
         .main-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 15px; height: 15px; border-top: 4px solid #fff; border-left: 4px solid #fff; }
         .main-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 15px; height: 15px; border-bottom: 4px solid #fff; border-right: 4px solid #fff; }
 
-        /* --- INTERFACE --- */
+        /* UI ELEMENTS */
         .top-right-stack { position: absolute; top: 30px; right: 25px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 50; }
         .kebab-btn { width: 20px; height: 20px; position: relative; background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .kebab-btn::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #fff; box-shadow: 0 -7px 0 #fff, 0 7px 0 #fff; filter: drop-shadow(0 0 3px var(--blue)); }
+        
         .res-row { font-size: 0.8rem; color: #8899aa; display: flex; gap: 10px; align-items: center; justify-content: flex-end; height: 24px; }
         .sys-num-unified { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 1.2rem; text-shadow: var(--sys-text-glow); letter-spacing: 1px; }
 
-        /* GOLD */
         #gold-container-wrapper { width: 100%; display: none; justify-content: flex-end; margin-top: 8px; }
         .gold-box-frame { border: 2px solid #fff; background: rgba(2, 8, 20, 0.9); backdrop-filter: blur(4px); box-shadow: var(--glow); padding: 5px 20px; display: flex; align-items: center; gap: 15px; position: relative; }
-        .gold-box-frame::before { content: ''; position: absolute; top: -2px; left: -2px; width: 6px; height: 6px; border-top: 2px solid #fff; border-left: 2px solid #fff; }
-        .gold-box-frame::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 6px; height: 6px; border-bottom: 2px solid #fff; border-right: 2px solid #fff; }
         .gold-wrapper { display: inline-flex; align-items: center; }
         .gold-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1.5px solid #fff; border-radius: 50%; box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); color: #fff; font-size: 0.7rem; font-weight: 800; text-shadow: 0 0 5px var(--blue); margin-left: 5px; position: relative; top: -1px; }
 
-        @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes sys-open { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 1; } }
-        
         .content { display: none; width: 100%; }
         .content.active { display: block; animation: system-fade 0.4s ease; }
+        @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        h2.tab-title { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--blue); margin-bottom: 30px; font-size: 1.8rem; margin-top: 10px; }
+        h2.tab-title { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--blue); margin-bottom: 20px; font-size: 1.8rem; margin-top: 10px; }
+        
+        /* STATUS */
         .header-grid { display: grid; grid-template-columns: auto 1fr; gap: 25px; align-items: end; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 20px; margin-bottom: 20px; }
         .lvl-num { font-size: 4.5rem; font-weight: 700; text-shadow: 0 0 15px #fff; line-height: 0.8; }
         .info-box { display: flex; flex-direction: column; gap: 6px; }
         .info-row { font-size: 0.85rem; color: #888; display: flex; align-items: center; margin-bottom: 4px; }
         .info-val { color: #fff; font-weight: bold; text-transform: uppercase; text-shadow: var(--sys-text-glow); }
         .rank-box { color: #fff; border: 1px solid var(--blue); padding: 0 5px; margin-left: 5px; font-weight: bold; text-shadow: var(--sys-text-glow); box-shadow: 0 0 5px rgba(0, 234, 255, 0.3); }
-        
+
         .xp-text-display { font-size: 0.8rem; color: #fff; text-shadow: var(--sys-text-glow); font-weight: 700; margin-bottom: 4px; display: flex; justify-content: space-between; }
         .bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 5px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
         .xp-fill { background: #fff; box-shadow: 0 0 10px #fff; }
         .fatigue-fill { background: #ff3333; box-shadow: 0 0 10px #ff3333; }
+        
         .stat-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 8px; }
         .stat-label { font-size: 1.2rem; font-weight: 600; color: #ccc; width: 50px; }
         .stat-val { font-size: 1.6rem; font-weight: 700; margin-left: 10px; color: #fff; text-shadow: var(--sys-text-glow); }
+        .stat-bonus { font-size: 0.9rem; color: var(--blue); margin-left: 5px; font-weight: normal; } 
         .plus-btn { width: 24px; height: 24px; border: 1px solid var(--blue); margin-left: auto; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--blue); }
 
-        .quest-item, .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
-        .quest-reward { color: #888; font-size: 0.7rem; margin-left: 10px; }
-        
-        .mon-white { color: #fff; text-shadow: 0 0 5px #fff; }
+        /* SKILLS SECTION */
+        .skills-container { margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; }
+        .skill-header { font-size: 1rem; color: var(--blue); margin-bottom: 10px; font-weight: bold; }
+        .skill-card { border: 1px solid #444; background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .skill-name { font-weight: bold; color: #fff; }
+        .skill-desc { font-size: 0.7rem; color: #888; }
+        .skill-btn { border: 1px solid var(--blue); color: var(--blue); background: none; font-size: 0.7rem; padding: 3px 8px; cursor: pointer; }
+        .skill-btn.active { background: var(--blue); color: #000; box-shadow: 0 0 5px var(--blue); }
+        .skill-locked { color: #444; border-color: #333; }
+
+        /* QUESTS */
+        .quest-item { display: flex; flex-direction: column; padding: 15px 0; border-bottom: 1px solid #333; }
+        .q-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .q-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px;}
+        .q-btn { background: #333; border: 1px solid #555; color: #fff; width: 30px; height: 30px; cursor: pointer; font-weight: bold; }
+        .q-val { font-family: monospace; font-size: 1rem; color: var(--blue); width: 80px; text-align: center;}
+        .q-complete { color: var(--green); }
+        .q-over { color: var(--gold); text-shadow: 0 0 5px var(--gold); }
+
+        /* DUNGEONS & SHOP */
+        .dungeon-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #333; align-items: center; }
+        .mon-white { color: #fff; }
         .mon-orange { color: #FFA500; text-shadow: 0 0 5px #FFA500; } 
         .mon-red { color: var(--red); text-shadow: 0 0 5px var(--red); }
-        .mon-purple { color: var(--purple); text-shadow: 0 0 5px var(--purple); font-weight:bold;} /* Nova cor para Instância */
-        
+        .mon-purple { color: var(--purple); text-shadow: 0 0 5px var(--purple); font-weight:bold;}
         .enter-btn { border: 1px solid var(--red); color: var(--red); background: rgba(255, 50, 50, 0.1); padding: 5px 15px; font-weight: bold; cursor: pointer; min-width: 80px; }
         .enter-btn.cooldown { border: 1px solid var(--gray); color: var(--gray); background: rgba(0,0,0,0.5); cursor: not-allowed; font-size: 0.7rem; }
         .enter-btn.instance { border: 1px solid var(--purple); color: var(--purple); background: rgba(191, 0, 255, 0.1); }
@@ -101,20 +126,24 @@
         .claim-btn { width:100%; padding:15px; margin-top:20px; border:1px solid var(--blue); color:var(--blue); background:rgba(0,234,255,0.1); font-weight:bold; cursor:pointer; }
         .claim-btn.disabled { border:1px solid var(--gray); color:var(--gray); background:transparent; cursor:not-allowed; }
 
-        #sys-modal { position: absolute; top: 150px; left: 5%; width: 90%; background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); box-shadow: 0 0 30px var(--blue); z-index: 2000; display: none; flex-direction: column; padding: 20px; text-align: center; animation: sys-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .shop-item { border: 1px solid var(--blue); padding: 12px; text-align: center; background: rgba(0,0,0,0.6); cursor: pointer; }
-        .item-card { border: 1px solid var(--blue); background: rgba(0,234,255,0.05); padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .item-btn-group { display: flex; gap: 5px; }
-        .use-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; }
-        .sell-btn { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; text-shadow: 0 0 5px var(--blue); }
+        .shop-item { border: 1px solid var(--blue); padding: 12px; text-align: center; background: rgba(0,0,0,0.6); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; height: 110px;}
+        .item-card { border: 1px solid var(--blue); background: rgba(0,234,255,0.05); padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;}
+        .btn-small { border: 1px solid var(--blue); color: var(--blue); background:none; padding: 2px 8px; font-size: 0.7rem; cursor: pointer; margin-left: 5px;}
+        .btn-small.equip { border-color: var(--purple); color: var(--purple); text-shadow: 0 0 5px var(--purple); }
+
+        /* MODALS */
+        #sys-modal, #reward-modal, #penalty-modal { position: absolute; top: 150px; left: 5%; width: 90%; background: rgba(2, 8, 20, 0.98); border: 2px solid var(--blue); box-shadow: 0 0 30px var(--blue); z-index: 2000; display: none; flex-direction: column; padding: 20px; text-align: center; animation: sys-open 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #penalty-modal { border-color: var(--red); box-shadow: 0 0 30px var(--red); top: 50px; }
+        #reward-modal { border-color: var(--gold); box-shadow: 0 0 30px var(--gold); }
         
-        /* TIMER FLUIDO */
-        .active-mission-box {
-            margin-top: 30px; margin-bottom: 10px; padding: 15px; border: 2px solid var(--blue); background: rgba(0, 234, 255, 0.05); text-align: center; display: none; box-shadow: inset 0 0 15px rgba(0, 234, 255, 0.1); opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .active-mission-box.visible { opacity: 1; transform: translateY(0); }
+        .reward-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .reward-box-item { border: 1px solid #fff; padding: 10px; color: #aaa; font-size: 0.8rem; }
+        .reward-box-item.rare { border-color: var(--purple); color: var(--purple); font-weight: bold; }
+        
         .timer-digits { font-size: 2.5rem; font-weight: 700; color: #fff; text-shadow: 0 0 15px var(--blue); font-family: 'Chakra Petch', sans-serif; letter-spacing: 3px; }
+        .active-mission-box { margin-top: 30px; margin-bottom: 10px; padding: 15px; border: 2px solid var(--blue); background: rgba(0, 234, 255, 0.05); text-align: center; display: none; }
+        .active-mission-box.visible { display: block; }
 
         .nav-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #02050a; border-top: 2px solid #fff; display: flex; justify-content: space-around; padding: 15px 0; z-index: 100; }
         .nav-btn { background: none; border: none; color: #444; font-family: inherit; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; }
@@ -123,6 +152,7 @@
     </style>
 </head>
 <body id="b">
+    <div id="toxic-overlay"></div>
     <div id="notification">MSG</div>
 
     <div id="m" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; display:none; justify-content:center; align-items:center;">
@@ -140,6 +170,23 @@
     <div class="layout-wrapper">
         <div class="main-frame">
             
+            <div id="penalty-modal">
+                <h2 style="color:var(--red); font-size:1.5rem;">PENALTY QUEST</h2>
+                <p style="color:#fff; margin:15px 0;">You failed to complete the daily quest.</p>
+                <p style="color:#aaa; font-size:0.9rem;">SURVIVE IN THE PENALTY ZONE</p>
+                <div style="font-size:3rem; font-weight:bold; color:var(--red); margin:20px 0;">04:00:00</div>
+                <button onclick="game.clearPenalty()" style="background:var(--red); border:none; padding:10px 30px; font-weight:bold; cursor:pointer; color:#fff;">SURVIVE</button>
+            </div>
+
+            <div id="reward-modal">
+                <h3 style="color:var(--gold); margin-bottom:15px;">QUEST COMPLETE</h3>
+                <div id="reward-list" class="reward-grid"></div>
+                <div style="display:flex; gap:10px; justify-content:center;">
+                    <button onclick="game.acceptRewards()" style="background:var(--blue); border:none; padding:10px 20px; font-weight:bold; cursor:pointer;">ACCEPT</button>
+                    <button onclick="document.getElementById('reward-modal').style.display='none'" style="background:transparent; border:1px solid #555; color:#555; padding:10px 20px; font-weight:bold; cursor:pointer;">DECLINE</button>
+                </div>
+            </div>
+
             <div id="sys-modal">
                 <h3 style="color:#fff; margin-bottom:10px;">YOU DEFEATED THE ENEMY</h3>
                 <div id="sys-msg-detail" style="color:#aaa; font-size:0.9rem; margin-bottom:15px;"></div>
@@ -175,19 +222,32 @@
                         <div class="bar-container"><div id="fatigue-bar" class="bar-fill fatigue-fill"></div></div>
                     </div>
                 </div>
-                <div class="stats-list">
-                    <div class="stat-row"><span class="stat-label">STR</span><span id="val-STR" class="stat-val">10</span><div class="plus-btn" onclick="game.add('STR')">+</div></div>
-                    <div class="stat-row"><span class="stat-label">VIT</span><span id="val-VIT" class="stat-val">10</span><div class="plus-btn" onclick="game.add('VIT')">+</div></div>
-                    <div class="stat-row"><span class="stat-label">AGI</span><span id="val-AGI" class="stat-val">10</span><div class="plus-btn" onclick="game.add('AGI')">+</div></div>
-                    <div class="stat-row"><span class="stat-label">INT</span><span id="val-INT" class="stat-val">10</span><div class="plus-btn" onclick="game.add('INT')">+</div></div>
-                    <div class="stat-row"><span class="stat-label">PER</span><span id="val-PER" class="stat-val">10</span><div class="plus-btn" onclick="game.add('PER')">+</div></div>
+                
+                <div class="equip-slot">
+                    <span class="equip-label">EQUIPPED:</span>
+                    <span id="val-equipped" class="equip-name">NONE</span>
+                </div>
+
+                <div class="stats-list" style="margin-top:15px;">
+                    <div class="stat-row"><span class="stat-label">STR</span><span id="val-STR" class="stat-val">10</span><span id="bonus-STR" class="stat-bonus"></span><div class="plus-btn" onclick="game.add('STR')">+</div></div>
+                    <div class="stat-row"><span class="stat-label">VIT</span><span id="val-VIT" class="stat-val">10</span><span id="bonus-VIT" class="stat-bonus"></span><div class="plus-btn" onclick="game.add('VIT')">+</div></div>
+                    <div class="stat-row"><span class="stat-label">AGI</span><span id="val-AGI" class="stat-val">10</span><span id="bonus-AGI" class="stat-bonus"></span><div class="plus-btn" onclick="game.add('AGI')">+</div></div>
+                    <div class="stat-row"><span class="stat-label">INT</span><span id="val-INT" class="stat-val">10</span><span id="bonus-INT" class="stat-bonus"></span><div class="plus-btn" onclick="game.add('INT')">+</div></div>
+                    <div class="stat-row"><span class="stat-label">PER</span><span id="val-PER" class="stat-val">10</span><span id="bonus-PER" class="stat-bonus"></span><div class="plus-btn" onclick="game.add('PER')">+</div></div>
+                </div>
+
+                <div class="skills-container">
+                    <div class="skill-header">SKILLS</div>
+                    <div id="skills-list">
+                        </div>
                 </div>
             </div>
 
             <div id="tab-quests" class="content">
                 <h2 id="txt-quests" class="tab-title">DAILY QUESTS</h2>
+                <div style="font-size:0.8rem; color:#888; text-align:center; margin-bottom:15px;">COMPLETE DOUBLE FOR HIDDEN REWARD</div>
                 <div id="q-list"></div>
-                <button id="btn-claim" class="claim-btn" onclick="game.claimDailyRewards()">CLAIM XP</button>
+                <button id="btn-claim" class="claim-btn" onclick="game.prepareReward()">CLAIM XP</button>
             </div>
 
             <div id="tab-dungeon" class="content">
@@ -201,10 +261,10 @@
             <div id="tab-shop" class="content">
                 <h2 id="txt-shop" class="tab-title">SHOP</h2>
                 <div class="shop-grid">
-                    <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span class="gold-wrapper"><span class="sys-num-unified">30</span><span class="gold-icon">G</span></span><br><small>-10 Fatigue</small></div>
-                    <div class="shop-item" onclick="game.buy('Potion', 100)">POTION<br><span class="gold-wrapper"><span class="sys-num-unified">100</span><span class="gold-icon">G</span></span><br><small>-40 Fatigue</small></div>
-                    <div class="shop-item" onclick="game.buy('Return Stone', 200)">RETURN STONE<br><span class="gold-wrapper"><span class="sys-num-unified">200</span><span class="gold-icon">G</span></span></div>
-                    <div class="shop-item" onclick="game.buy('E-Rank Dagger', 500)">DAGGER<br><span class="gold-wrapper"><span class="sys-num-unified">500</span><span class="gold-icon">G</span></span></div>
+                    <div class="shop-item" onclick="game.buy('Bandage', 30)">BANDAGE<br><span class="gold-wrapper"><span class="sys-num-unified">30</span><span class="gold-icon">G</span></span><small>-10 Fatigue</small></div>
+                    <div class="shop-item" onclick="game.buy('Soju Bottle', 50)">SOJU<br><span class="gold-wrapper"><span class="sys-num-unified">50</span><span class="gold-icon">G</span></span><small style="color:var(--red)">TOXIC</small></div>
+                    <div class="shop-item" onclick="game.buy('Random Box', 500)">RANDOM BOX<br><span class="gold-wrapper"><span class="sys-num-unified">500</span><span class="gold-icon">G</span></span><small>Mystery</small></div>
+                    <div class="shop-item" onclick="game.buy('Knight Killer', 1500)">KNIGHT KILLER<br><span class="gold-wrapper"><span class="sys-num-unified">1500</span><span class="gold-icon">G</span></span><small>+20 STR</small></div>
                 </div>
                 <h3 style="margin-top:25px; border-bottom:1px solid #333;" id="txt-inv">INVENTORY</h3>
                 <div id="inv-list" style="padding-top:10px;"></div>
@@ -220,7 +280,6 @@
                 </span>
             </div>
         </div>
-
     </div>
 
     <nav class="nav-bar">
@@ -232,28 +291,49 @@
 
     <script>
         const trans = {
-            en: { status: "STATUS", quests: "DAILY QUESTS", shop: "SHOP", pts: "POINTS:", gold: "GOLD:", settings: "SETTINGS", inv: "INVENTORY", empty: "Empty", use: "USE", sell: "SELL", claim: "[ CLAIM XP ]", q1: "Push-ups", q2: "Sit-ups", q3: "Squats", q4: "10km Run", j0: "NONE", j2: "SHADOW MONARCH", j3: "SOUL SHEPHERD", j4: "TITAN OF TWILIGHT", t0: "NONE", t1: "WOLF ASSASSIN", t2: "ONE WHO OVERCAME ADVERSITY", t3: "DEMON SLAYER" },
-            pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", claim: "[ RESGATAR XP ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Correr 10km", j0: "NENHUM", j2: "MONARCA DAS SOMBRAS", j3: "PASTOR DE ALMAS", j4: "TITÃ DO CREPÚSCULO", t0: "NENHUM", t1: "ASSASSINO DE LOBOS", t2: "SUPEROU A ADVERSIDADE", t3: "ASSASSINO DE DEMÔNIOS" }
+            en: { status: "STATUS", quests: "DAILY QUESTS", shop: "SHOP", pts: "POINTS:", gold: "GOLD:", settings: "SETTINGS", inv: "INVENTORY", empty: "Empty", use: "USE", sell: "SELL", equip: "EQUIP", unequip: "UNEQUIP", claim: "[ CLAIM REWARDS ]", q1: "Push-ups", q2: "Sit-ups", q3: "Squats", q4: "Running (km)", j0: "NONE", j2: "SHADOW MONARCH", j3: "SOUL SHEPHERD", j4: "TITAN OF TWILIGHT", t0: "NONE", t1: "WOLF ASSASSIN", t2: "ONE WHO OVERCAME ADVERSITY", t3: "DEMON SLAYER" },
+            pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", equip: "EQUIPAR", unequip: "DESEQUIPAR", claim: "[ RESGATAR ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Corrida (km)", j0: "NENHUM", j2: "MONARCA DAS SOMBRAS", j3: "PASTOR DE ALMAS", j4: "TITÃ DO CREPÚSCULO", t0: "NENHUM", t1: "ASSASSINO DE LOBOS", t2: "SUPEROU A ADVERSIDADE", t3: "ASSASSINO DE DEMÔNIOS" }
         };
 
         const MIN = 60000;
         const HOUR = 3600000;
         
-        // isInstance: Identifica a dungeon especial do anime
+        const itemsDB = {
+            "Bandage": { type: 'consume', price: 30, desc: "-10 Fatigue" },
+            "Potion": { type: 'consume', price: 100, desc: "-40 Fatigue" },
+            "Soju Bottle": { type: 'toxic', price: 50, desc: "Alcohol (+20 Fatigue)" },
+            "Random Box": { type: 'consume', price: 500, desc: "Mystery Item" },
+            "Blessed Box": { type: 'consume', price: 0, desc: "Rare Rewards" },
+            "Cursed Box": { type: 'consume', price: 0, desc: "Risky Rewards" },
+            "Instance Key": { type: 'misc', price: 0, desc: "Unlocks Subway" },
+            "E-Rank Dagger": { type: 'equip', price: 500, stats: {STR: 5, AGI: 2}, desc: "Basic Dagger" },
+            "Kasaka's Venom Fang": { type: 'equip', price: 3000, stats: {STR: 15, AGI: 15}, desc: "Paralysis Effect" },
+            "Knight Killer": { type: 'equip', price: 1500, stats: {STR: 25, VIT: 5}, desc: "Armor Pierce" },
+            "Demon King's Dagger": { type: 'equip', price: 20000, stats: {STR: 60, AGI: 40}, desc: "S-Rank Weapon" },
+            // Drops
+            "Goblin Stone": { type: 'misc', price: 10 }, "Lycan Fang": { type: 'misc', price: 25 }, "Centipede Shell": { type: 'misc', price: 50 }, "Ice Crystal": { type: 'misc', price: 100 }, "Orc Tusk": { type: 'misc', price: 250 }, "Ant Wing": { type: 'misc', price: 1000 }, "Baruka's Dagger": { type: 'equip', price: 5000, stats: {AGI:35, STR:10} }
+        };
+
         const dungeonData = [
-            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, visualTime: 3, cooldownTime: 5 * MIN, minLvl: 1 }, 
-            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, visualTime: 5, cooldownTime: 15 * MIN, minLvl: 5 }, 
-            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, visualTime: 8, cooldownTime: 30 * MIN, minLvl: 15 }, 
-            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, visualTime: 10, cooldownTime: 1 * HOUR, minLvl: 25 }, 
-            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, visualTime: 15, cooldownTime: 4 * HOUR, minLvl: 40 }, 
-            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, visualTime: 20, cooldownTime: 12 * HOUR, minLvl: 60 },
-            // Dungeon Secreta (Instance)
-            { name: "Instant Dungeon: Subway", mob: "Blue Venom-Fang Kasaka", diff: "purple", drop: "Kasaka's Venom Fang", price: 2000, xp: 600, cost: 50, visualTime: 25, cooldownTime: 0, minLvl: 1, isInstance: true } 
+            { name: "E-Rank Gate", mob: "Goblin", diff: "white", drop: "Goblin Stone", price: 10, xp: 5, cost: 5, visualTime: 3, cooldownTime: 1 * MIN, minLvl: 1 }, 
+            { name: "D-Rank Gate", mob: "Steel Fang Lycan", diff: "white", drop: "Lycan Fang", price: 25, xp: 15, cost: 10, visualTime: 5, cooldownTime: 5 * MIN, minLvl: 5 }, 
+            { name: "C-Rank Gate", mob: "Giant Centipede", diff: "orange", drop: "Centipede Shell", price: 50, xp: 40, cost: 20, visualTime: 8, cooldownTime: 15 * MIN, minLvl: 15 }, 
+            { name: "B-Rank Gate", mob: "Ice Bear", diff: "orange", drop: "Ice Crystal", price: 100, xp: 80, cost: 30, visualTime: 10, cooldownTime: 30 * MIN, minLvl: 25 }, 
+            { name: "A-Rank Gate", mob: "High Orc", diff: "red", drop: "Orc Tusk", price: 250, xp: 150, cost: 50, visualTime: 15, cooldownTime: 1 * HOUR, minLvl: 35 }, 
+            { name: "S-Rank Gate", mob: "Giant Ant", diff: "red", drop: "Ant Wing", price: 1000, xp: 500, cost: 90, visualTime: 20, cooldownTime: 4 * HOUR, minLvl: 50 },
+            { name: "Red Gate: Ice Elves", mob: "Baruka", diff: "red", drop: "Baruka's Dagger", price: 5000, xp: 1500, cost: 100, visualTime: 30, cooldownTime: 12 * HOUR, minLvl: 60 },
+            { name: "Instant Dungeon: Subway", mob: "Blue Venom-Fang Kasaka", diff: "purple", drop: "Kasaka's Venom Fang", price: 0, xp: 600, cost: 50, visualTime: 15, cooldownTime: 0, minLvl: 1, isInstance: true } 
         ];
 
-        const itemPrices = { "Goblin Stone": 10, "Lycan Fang": 25, "Centipede Shell": 50, "Ice Crystal": 100, "Orc Tusk": 250, "Ant Wing": 1000, "Bandage": 15, "Potion": 50, "Return Stone": 100, "E-Rank Dagger": 250, "Kasaka's Venom Fang": 5000 };
+        const skillsData = {
+            "Sprint": { lvl: 1, type: "active", desc: "Speed +30%", active: false },
+            "Stealth": { lvl: 10, type: "active", desc: "Invisible", active: false },
+            "Vital Strike": { lvl: 15, type: "passive", desc: "Crit Chance +", active: true },
+            "Courage of the Weak": { lvl: 1, type: "passive", desc: "Detox Buff", active: true } // Desbloqueia cedo para facilitar
+        };
 
         let missionTimer = null; 
+        let pendingRewards = null; // Armazena recompensas pendentes para o modal
 
         function msToTime(duration) {
             let seconds = Math.floor((duration / 1000) % 60);
@@ -267,99 +347,177 @@
                 stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, 
                 pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', 
                 inventory: [], 
-                quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}],
+                equipped: null,
+                quests: [
+                    {id:'q1', current:0, target:100, step:10}, 
+                    {id:'q2', current:0, target:100, step:10}, 
+                    {id:'q3', current:0, target:100, step:10}, 
+                    {id:'q4', current:0, target:10, step:1} // Run
+                ],
+                unlockedSkills: ["Sprint", "Courage of the Weak"], // Inicia com Courage para testar
                 dungeonCooldowns: [],
-                dailyReset: null,
-                instanceUnlocked: false // Controla se a chave foi usada
+                lastLoginDay: new Date().toDateString(),
+                dailyCompleted: false,
+                instanceUnlocked: false
             },
             init() {
-                const s = localStorage.getItem('solo_v44');
+                const s = localStorage.getItem('solo_v46');
                 if(s) {
                     const parsed = JSON.parse(s);
                     this.data = {...this.data, ...parsed};
-                    if(!this.data.dungeonCooldowns) this.data.dungeonCooldowns = [];
+                    // Migração de dados antigos se necessário
+                    if(!this.data.quests[0].target) {
+                        // Reset quests format for V46
+                        this.data.quests = [
+                            {id:'q1', current:0, target:100, step:10}, 
+                            {id:'q2', current:0, target:100, step:10}, 
+                            {id:'q3', current:0, target:100, step:10}, 
+                            {id:'q4', current:0, target:10, step:1}
+                        ];
+                    }
                 }
+                
+                this.checkDailyPenalty();
+                
                 ui.tab('status'); 
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v44', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v46', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v44'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v46'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
-            
             getMaxXP(lvl) { return lvl * 100; },
+            getTotalStats() {
+                let t = { ...this.data.stats };
+                if (this.data.equipped) {
+                    const item = itemsDB[this.data.equipped];
+                    if (item && item.stats) { for(let s in item.stats) if(t[s] !== undefined) t[s] += item.stats[s]; }
+                }
+                return t;
+            },
+
+            // --- PENALTY LOGIC ---
+            checkDailyPenalty() {
+                const today = new Date().toDateString();
+                if(this.data.lastLoginDay !== today) {
+                    // Dia mudou. Se não completou ontem, penalidade.
+                    if(!this.data.dailyCompleted) {
+                        document.getElementById('penalty-modal').style.display = 'flex';
+                        this.data.fatigue = 100; // Penalidade
+                    }
+                    // Reset
+                    this.data.quests.forEach(q => q.current = 0);
+                    this.data.dailyCompleted = false;
+                    this.data.lastLoginDay = today;
+                    this.save();
+                }
+            },
+            clearPenalty() {
+                document.getElementById('penalty-modal').style.display = 'none';
+                ui.notify("SURVIVED PENALTY ZONE");
+            },
 
             tick() {
-                const now = Date.now();
-                if (this.data.dailyReset && now >= this.data.dailyReset) {
-                    this.data.dailyReset = null;
-                    this.data.quests.forEach(q => q.done = false);
-                    ui.notify("DAILY QUESTS RESET");
-                    this.save();
-                    ui.render();
-                }
                 if(document.getElementById('tab-dungeon').classList.contains('active')) {
                     ui.updateDungeonButtons();
                 }
-                if(document.getElementById('tab-quests').classList.contains('active')) {
-                    ui.updateClaimButton();
+                // Secret Quest Check (0.05% chance per second)
+                if(Math.random() < 0.0005) {
+                    ui.notify("SECRET QUEST: HIDDEN BOSS NEARBY");
                 }
             },
 
-            toggle(i) { 
-                if (this.data.dailyReset) return; 
+            // --- QUEST LOGIC (COUNTERS) ---
+            addQuestProgress(i) {
+                if(this.data.dailyCompleted) return;
                 const q = this.data.quests[i];
-                q.done = !q.done;
+                q.current += q.step;
                 this.save();
                 ui.render();
             },
 
-            claimDailyRewards() {
-                if (this.data.dailyReset) return; 
-                if(this.data.quests.every(q => q.done)) {
-                    this.data.xp += 100; 
-                    this.data.fatigue -= 20; if(this.data.fatigue < 0) this.data.fatigue = 0;
-                    
-                    // CHANCE DE RANDOM BOX (30%)
-                    if (Math.random() < 0.3) {
-                         this.data.inventory.push("Random Box");
-                         ui.notify("REWARD: RANDOM BOX!");
-                    }
+            prepareReward() {
+                if(this.data.dailyCompleted) return;
 
-                    this.checkLevelUp();
-                    
-                    this.data.dailyReset = Date.now() + (24 * HOUR);
-                    this.save(); 
-                    ui.render(); 
-                    ui.notify("REWARDS CLAIMED");
+                const allComplete = this.data.quests.every(q => q.current >= q.target);
+                if(!allComplete) { ui.notify("COMPLETE ALL QUESTS"); return; }
+
+                // Check Over-achievement (Double)
+                const isHidden = this.data.quests.every(q => q.current >= q.target * 2);
+                
+                pendingRewards = [];
+                pendingRewards.push("Full Recovery");
+                pendingRewards.push("+3 Stat Points");
+                
+                if(isHidden) {
+                    pendingRewards.push("Blessed Box");
+                    pendingRewards.push("Hidden Reward: Key?");
                 } else {
-                    ui.notify("COMPLETE ALL QUESTS");
+                    pendingRewards.push("Random Box");
                 }
+
+                // Show Modal
+                ui.showRewardModal(pendingRewards, isHidden);
+            },
+
+            acceptRewards() {
+                if(!pendingRewards) return;
+                
+                this.data.fatigue = 0;
+                this.data.pts += 3;
+                this.data.xp += 100;
+                
+                pendingRewards.forEach(r => {
+                    if(r === "Random Box") this.data.inventory.push("Random Box");
+                    if(r === "Blessed Box") this.data.inventory.push("Blessed Box");
+                    // Chance baixa de chave S-Rank na Hidden Reward
+                    if(r.includes("Hidden Reward") && Math.random() < 0.05) {
+                        this.data.inventory.push("Demon Castle Key"); 
+                        ui.notify("OBTAINED: S-RANK KEY");
+                    }
+                });
+
+                this.data.dailyCompleted = true;
+                this.checkLevelUp();
+                this.save();
+                
+                document.getElementById('reward-modal').style.display = 'none';
+                ui.render();
+                ui.notify("REWARDS ACCEPTED");
             },
             
             checkLevelUp() {
                 let maxXP = this.getMaxXP(this.data.lvl);
-                // Loop para permitir subir múltiplos níveis (como no anime)
                 while(this.data.xp >= maxXP) { 
                     this.data.xp -= maxXP; 
                     this.data.lvl++; 
                     this.data.pts += 3; 
+                    this.checkSkillUnlock();
                     ui.notify("LEVEL UP!"); 
                     maxXP = this.getMaxXP(this.data.lvl);
                 }
             },
 
+            checkSkillUnlock() {
+                for(let s in skillsData) {
+                    if(this.data.lvl >= skillsData[s].lvl && !this.data.unlockedSkills.includes(s)) {
+                        this.data.unlockedSkills.push(s);
+                        ui.notify(`SKILL UNLOCKED: ${s}`);
+                    }
+                }
+            },
+
             enterDungeon(idx) {
+                const dg = dungeonData[idx];
                 const now = Date.now();
-                // Se não for instância, checa cooldown
-                if(!dungeonData[idx].isInstance) {
+                if(!dg.isInstance) {
                     const unlockTime = this.data.dungeonCooldowns[idx] || 0;
                     if (now < unlockTime) { ui.notify("DUNGEON LOCKED"); return; }
                 }
 
-                const dg = dungeonData[idx];
-                const vitBonus = Math.floor(this.data.stats.VIT * 0.2);
+                const totalStats = this.getTotalStats();
+                const vitBonus = Math.floor(totalStats.VIT * 0.2);
                 let finalCost = dg.cost - vitBonus;
                 if (finalCost < 1) finalCost = 1;
 
@@ -369,38 +527,39 @@
                 this.save();
                 ui.render();
                 
-                const agiMod = Math.min(0.5, this.data.stats.AGI * 0.02);
-                const finalTime = Math.max(1, dg.visualTime * (1 - agiMod));
+                const agiMod = Math.min(0.6, totalStats.AGI * 0.02);
+                // Skill Sprint buff
+                const hasSprint = this.data.unlockedSkills.includes("Sprint"); 
+                // Simplificação: Sprint é passivo/ativo. Vamos assumir ativo automaticamente na dungeon.
+                const sprintMod = hasSprint ? 0.3 : 0;
+
+                const finalTime = Math.max(1, dg.visualTime * (1 - agiMod - sprintMod));
 
                 ui.startMissionTimer(finalTime, () => {
-                    // Só aplica cooldown se não for instância
-                    if(!dg.isInstance) {
-                        this.data.dungeonCooldowns[idx] = Date.now() + dg.cooldownTime;
-                    }
+                    if(!dg.isInstance) this.data.dungeonCooldowns[idx] = Date.now() + dg.cooldownTime;
 
-                    let winChance = 0.8 + (this.data.stats.STR * 0.01);
+                    let winChance = 0.75 + (totalStats.STR * 0.01);
                     if (winChance > 0.98) winChance = 0.98;
 
                     ui.stopMissionTimer(); 
                     
                     if(Math.random() < winChance) {
-                        const intBonus = 1 + (this.data.stats.INT * 0.05);
+                        const intBonus = 1 + (totalStats.INT * 0.05);
                         const finalXP = Math.floor(dg.xp * intBonus);
-                        
                         this.data.xp += finalXP; 
-                        this.data.inventory.push(dg.drop);
                         
-                        // Se for a instância, ela fecha após vencer
-                        if(dg.isInstance) {
-                            this.data.instanceUnlocked = false; 
-                            ui.notify("INSTANCE CLOSED");
+                        const dropItem = itemsDB[dg.drop];
+                        if (dropItem && dropItem.type === 'equip' && (this.data.inventory.includes(dg.drop) || this.data.equipped === dg.drop)) {
+                            this.data.gold += (dropItem.price || 1000);
+                            ui.notify(`DUPLICATE CONVERTED TO GOLD`);
+                        } else {
+                            this.data.inventory.push(dg.drop);
                         }
+                        if(dg.isInstance) { this.data.instanceUnlocked = false; ui.notify("INSTANCE CLOSED"); }
 
                         this.checkLevelUp();
                         ui.showSysModal(dg.mob, dg.drop);
-                    } else { 
-                        ui.notify("DEFEAT! ESCAPED SAFELY..."); 
-                    }
+                    } else { ui.notify("DEFEAT! ESCAPED SAFELY..."); }
                     this.save(); ui.render();
                 });
             },
@@ -409,51 +568,83 @@
             
             useItem(index) {
                 const item = this.data.inventory[index];
-                
-                // --- LÓGICA DE ITENS ESPECIAIS ---
-                if(item === 'Random Box') {
+                const dbItem = itemsDB[item];
+
+                // Equip logic
+                if (dbItem && dbItem.type === 'equip') {
+                    if (this.data.equipped) this.data.inventory.push(this.data.equipped);
+                    this.data.equipped = item;
                     this.data.inventory.splice(index, 1);
-                    // 50% chance de chave, 50% de ouro
-                    if(Math.random() < 0.5) {
-                        this.data.inventory.push("Instance Key");
-                        ui.notify("OBTAINED: INSTANCE KEY");
+                    this.save(); ui.render(); ui.notify("EQUIPPED: " + item);
+                    return;
+                }
+
+                // TOXIC ITEM LOGIC (Courage of the Weak)
+                if(dbItem && dbItem.type === 'toxic') {
+                    this.data.inventory.splice(index, 1);
+                    
+                    const hasCourage = this.data.unlockedSkills.includes("Courage of the Weak");
+                    if(hasCourage) {
+                        // DETOX EFFECT
+                        ui.triggerDetox();
+                        this.data.fatigue = Math.max(0, this.data.fatigue - 20); // Cura em vez de ferir
+                        ui.notify("DETOXIFICADO: CORAGEM DOS FRACOS");
                     } else {
-                        this.data.gold += 500;
-                        ui.notify("OBTAINED: 500 GOLD");
+                        // TOXIC EFFECT
+                        ui.triggerToxic();
+                        this.data.fatigue = Math.min(100, this.data.fatigue + 20);
+                        ui.notify("ENVENENADO!");
+                    }
+                    this.save(); ui.render();
+                    return;
+                }
+
+                // Loot Boxes
+                if(item.includes('Box')) {
+                    this.data.inventory.splice(index, 1);
+                    if(item === 'Cursed Box') {
+                         this.data.fatigue = 99; 
+                         ui.notify("CURSE: FATIGUE INCREASED");
+                    } else {
+                        const rnd = Math.random();
+                        if(rnd < 0.1) { this.data.inventory.push("Instance Key"); ui.notify("FOUND: KEY"); }
+                        else if(rnd < 0.4) { this.data.inventory.push("Potion"); ui.notify("FOUND: POTION"); }
+                        else { this.data.gold += 1000; ui.notify("FOUND: GOLD"); }
                     }
                     this.save(); ui.render();
                     return;
                 }
 
                 if(item === 'Instance Key') {
-                    if(this.data.instanceUnlocked) {
-                        ui.notify("ALREADY UNLOCKED");
-                    } else {
-                        this.data.instanceUnlocked = true;
-                        this.data.inventory.splice(index, 1);
-                        ui.notify("DUNGEON UNLOCKED: SUBWAY");
-                    }
-                    this.save(); ui.render();
-                    return;
+                    if(this.data.instanceUnlocked) ui.notify("ALREADY UNLOCKED");
+                    else { this.data.instanceUnlocked = true; this.data.inventory.splice(index, 1); ui.notify("UNLOCKED: SUBWAY"); }
+                    this.save(); ui.render(); return;
                 }
-                // --------------------------------
-
-                if(item === 'Bandage') { this.data.fatigue -= 10; }
-                else if(item === 'Potion') { this.data.fatigue -= 40; }
+                
+                if(item === 'Bandage') this.data.fatigue -= 10;
+                else if(item === 'Potion') this.data.fatigue -= 40;
                 else { ui.notify("CANNOT USE."); return; }
+                
                 if(this.data.fatigue < 0) this.data.fatigue = 0;
                 this.data.inventory.splice(index, 1); this.save(); ui.render();
             },
+
+            unequip() {
+                if(this.data.equipped) {
+                    this.data.inventory.push(this.data.equipped);
+                    this.data.equipped = null;
+                    this.save(); ui.render();
+                }
+            },
+
             sellItem(index) {
                 const item = this.data.inventory[index];
-                const price = itemPrices[item] || 0;
+                const dbItem = itemsDB[item];
+                const price = (dbItem ? dbItem.price : 10) / 2; 
                 this.data.gold += price;
                 this.data.inventory.splice(index, 1);
                 this.save(); ui.render(); ui.notify(`SOLD: +${price}G`);
-            },
-            getRank(l) { if(l<=3) return 'E'; if(l<=8) return 'D'; if(l<=19) return 'C'; if(l<=39) return 'B'; if(l<=59) return 'A'; if(l<=69) return 'S'; if(l<=89) return 'SS'; return 'SSS'; },
-            getJobKey(l) { if(l < 40) return 'j0'; if(l < 80) return 'j2'; if(l < 100) return 'j3'; return 'j4'; },
-            getTitleKey(l) { if(l < 15) return 't0'; if(l < 40) return 't1'; if(l < 60) return 't2'; return 't3'; }
+            }
         };
 
         const ui = {
@@ -470,18 +661,34 @@
                 document.getElementById('n-' + n).classList.add('active');
             },
 
+            showRewardModal(rewards, isHidden) {
+                const list = document.getElementById('reward-list');
+                list.innerHTML = '';
+                rewards.forEach(r => {
+                    const isRare = r.includes("Hidden") || r.includes("Blessed");
+                    list.innerHTML += `<div class="reward-box-item ${isRare?'rare':''}">${r}</div>`;
+                });
+                document.getElementById('reward-modal').style.display = 'flex';
+            },
+
+            triggerToxic() {
+                const ov = document.getElementById('toxic-overlay');
+                ov.className = 'toxic-red'; ov.style.opacity = '1';
+                setTimeout(() => ov.style.opacity = '0', 2000);
+            },
+            triggerDetox() {
+                const ov = document.getElementById('toxic-overlay');
+                ov.className = 'detox-green'; ov.style.opacity = '1';
+                setTimeout(() => ov.style.opacity = '0', 2000);
+            },
+
             startMissionTimer(durationSeconds, onComplete) {
                 const timerContainer = document.getElementById('active-mission-box');
                 const timerText = document.getElementById('mission-timer-text');
-                timerContainer.style.display = 'block';
-                void timerContainer.offsetWidth; 
                 timerContainer.classList.add('visible');
-                
                 let remaining = durationSeconds;
                 const updateText = () => {
-                   let m = Math.floor(remaining / 60);
-                   let s = Math.floor(remaining % 60);
-                   let ms = Math.floor((remaining % 1) * 100);
+                   let m = Math.floor(remaining / 60); let s = Math.floor(remaining % 60); let ms = Math.floor((remaining % 1) * 100);
                    timerText.innerText = `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}:${ms < 10 ? '0'+ms : ms}`;
                 };
                 updateText();
@@ -502,32 +709,23 @@
                 if (missionTimer) clearInterval(missionTimer);
                 const timerContainer = document.getElementById('active-mission-box');
                 timerContainer.classList.remove('visible');
-                setTimeout(() => { timerContainer.style.display = 'none'; }, 400);
             },
 
             updateDungeonButtons() {
                 const now = Date.now();
                 const visibleBtns = document.querySelectorAll('.enter-btn');
                 visibleBtns.forEach(btn => {
-                    // Se for botão de instância, trata diferente
-                    if(btn.classList.contains('instance')) {
-                        btn.innerText = "ENTER";
-                        return;
-                    }
-
+                    if(btn.classList.contains('instance')) { btn.innerText = "ENTER"; return; }
                     const onclickAttr = btn.getAttribute('onclick'); 
                     if(onclickAttr) {
                         const idx = parseInt(onclickAttr.match(/\d+/)[0]);
                         const unlockTime = game.data.dungeonCooldowns[idx] || 0;
                         if (now < unlockTime) {
-                            const diff = unlockTime - now;
-                            btn.innerText = msToTime(diff);
-                            btn.classList.add('cooldown');
-                            btn.disabled = true;
+                            btn.innerText = msToTime(unlockTime - now);
+                            btn.classList.add('cooldown'); btn.disabled = true;
                         } else {
                             btn.innerText = "ENTER";
-                            btn.classList.remove('cooldown');
-                            btn.disabled = false;
+                            btn.classList.remove('cooldown'); btn.disabled = false;
                         }
                     }
                 });
@@ -535,17 +733,13 @@
 
             updateClaimButton() {
                 const btn = document.getElementById('btn-claim');
-                if (game.data.dailyReset) {
-                    const now = Date.now();
-                    const diff = game.data.dailyReset - now;
-                    if (diff > 0) {
-                        btn.innerText = `NEXT RESET: ${msToTime(diff)}`;
-                        btn.classList.add('disabled');
-                        return;
-                    }
+                if (game.data.dailyCompleted) {
+                    btn.innerText = "COMPLETED";
+                    btn.classList.add('disabled');
+                } else {
+                    btn.innerText = "[ CLAIM REWARDS ]";
+                    btn.classList.remove('disabled');
                 }
-                btn.innerText = "[ CLAIM XP ]";
-                btn.classList.remove('disabled');
             },
 
             toggleSettings() { document.getElementById('m').style.display = (document.getElementById('m').style.display === 'flex') ? 'none' : 'flex'; },
@@ -555,6 +749,7 @@
                 document.getElementById('sys-item-name').innerText = item;
                 document.getElementById('sys-modal').style.display = 'flex';
             },
+            
             render() {
                 const d = game.data; const t = trans[d.lang];
                 document.getElementById('txt-status').innerText = t.status;
@@ -574,28 +769,62 @@
                 const xpPercent = Math.min(100, (d.xp / maxXP) * 100);
                 document.getElementById('xp-bar').style.width = xpPercent + "%";
                 document.getElementById('val-xp-txt').innerText = `${Math.floor(d.xp)} / ${maxXP}`;
-
                 document.getElementById('fatigue-bar').style.width = d.fatigue + "%";
-                document.getElementById('val-rank').innerText = game.getRank(d.lvl);
-                document.getElementById('val-job').innerText = t[game.getJobKey(d.lvl)];
-                document.getElementById('val-title').innerText = t[game.getTitleKey(d.lvl)];
-                for(let k in d.stats) document.getElementById('val-'+k).innerText = d.stats[k];
+                document.getElementById('val-rank').innerText = "PLAYER"; // Changed to 'Player' as in Solo Leveling initially
+                document.getElementById('val-job').innerText = t[game.data.lvl > 40 ? 'j2' : 'j0'];
+                document.getElementById('val-title').innerText = t[game.data.lvl > 15 ? 't1' : 't0'];
                 
+                const totalStats = game.getTotalStats();
+                for(let k in d.stats) {
+                    document.getElementById('val-'+k).innerText = d.stats[k];
+                    const bonus = totalStats[k] - d.stats[k];
+                    document.getElementById('bonus-'+k).innerText = bonus > 0 ? `(+${bonus})` : '';
+                }
+
+                if(d.equipped) {
+                    document.getElementById('val-equipped').innerText = d.equipped;
+                    document.getElementById('val-equipped').innerHTML += ` <button class="btn-small unequip" onclick="game.unequip()">X</button>`;
+                } else { document.getElementById('val-equipped').innerText = "NONE"; }
+                
+                // RENDER SKILLS
+                const sl = document.getElementById('skills-list'); sl.innerHTML = '';
+                for(let sKey in skillsData) {
+                    const sk = skillsData[sKey];
+                    const unlocked = d.unlockedSkills.includes(sKey);
+                    if(unlocked) {
+                        sl.innerHTML += `
+                        <div class="skill-card">
+                            <div><div class="skill-name">${sKey}</div><div class="skill-desc">${sk.desc}</div></div>
+                            <button class="skill-btn active">ACTIVE</button>
+                        </div>`;
+                    }
+                }
+
+                // RENDER QUESTS WITH COUNTERS
                 const qL = document.getElementById('q-list'); qL.innerHTML = '';
-                const isDailyLocked = !!d.dailyReset;
                 d.quests.forEach((q, i) => {
-                    const checked = q.done ? 'checked' : '';
-                    const disabled = isDailyLocked ? 'disabled' : ''; 
-                    qL.innerHTML += `<div class="quest-item"><div><span style="${q.done?'text-decoration:line-through;color:#444':''}">${t[q.id]}</span></div><input type="checkbox" onclick="game.toggle(${i}); return false;" ${checked} ${disabled}></div>`;
+                    const isComplete = q.current >= q.target;
+                    const isOver = q.current >= q.target * 2;
+                    const statusClass = isOver ? 'q-over' : (isComplete ? 'q-complete' : '');
+                    qL.innerHTML += `
+                    <div class="quest-item">
+                        <div class="q-top">
+                            <span>${t[q.id]}</span>
+                            <span class="${statusClass}">[ ${isOver ? 'HIDDEN' : (isComplete ? 'COMPLETE' : 'INCOMPLETE')} ]</span>
+                        </div>
+                        <div class="q-controls">
+                            <span class="q-val">${q.current} / ${q.target}</span>
+                            <button class="q-btn" onclick="game.addQuestProgress(${i})">+</button>
+                        </div>
+                    </div>`;
                 });
                 this.updateClaimButton();
 
+                // DUNGEONS
                 const dL = document.getElementById('dungeon-list'); dL.innerHTML = '';
                 dungeonData.forEach((dg, i) => {
-                    // Mostra se tiver nível suficiente OU se for a instância desbloqueada
                     const showNormal = !dg.isInstance && d.lvl >= dg.minLvl;
                     const showInstance = dg.isInstance && d.instanceUnlocked;
-
                     if (showNormal || showInstance) {
                         const styleClass = dg.isInstance ? 'enter-btn instance' : 'enter-btn';
                         dL.innerHTML += `<div class="dungeon-item"><div><div style="font-weight:bold;">${dg.name}</div><div class="mon-${dg.diff}" style="font-size:0.8rem;">${dg.mob}</div></div><button class="${styleClass}" onclick="game.enterDungeon(${i})">ENTER</button></div>`;
@@ -603,10 +832,15 @@
                 });
                 this.updateDungeonButtons();
 
+                // INVENTORY
                 const iL = document.getElementById('inv-list');
                 if(d.inventory.length === 0) iL.innerHTML = `<div style="color:#444;text-align:center;">${t.empty}</div>`;
-                else iL.innerHTML = d.inventory.map((item, index) => `
-                    <div class="item-card"><span>${item}</span><div style="display:flex;gap:5px;"><button onclick="game.useItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;">${t.use}</button><button onclick="game.sellItem(${index})" style="border:1px solid var(--blue);color:var(--blue);background:none;padding:2px 5px;font-size:0.7rem;text-shadow:0 0 5px var(--blue);">${t.sell}</button></div></div>`).join('');
+                else iL.innerHTML = d.inventory.map((item, index) => {
+                    const dbItem = itemsDB[item];
+                    let desc = dbItem ? dbItem.desc : '';
+                    const actionBtn = (dbItem && dbItem.type === 'equip') ? `<button onclick="game.useItem(${index})" class="btn-small equip">${t.equip}</button>` : `<button onclick="game.useItem(${index})" class="btn-small">${t.use}</button>`;
+                    return `<div class="item-card"><div><span>${item}</span><div style="font-size:0.6rem;color:#666">${desc}</div></div><div style="display:flex;gap:5px;">${actionBtn}<button onclick="game.sellItem(${index})" class="btn-small">${t.sell}</button></div></div>`;
+                }).join('');
             }
         };
         game.init();
