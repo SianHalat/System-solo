@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V46 - The Player</title>
+    <title>SYSTEM V47 - Real Skills</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -100,16 +100,17 @@
         .skill-card { border: 1px solid #444; background: rgba(0,0,0,0.3); padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .skill-name { font-weight: bold; color: #fff; }
         .skill-desc { font-size: 0.7rem; color: #888; }
-        .skill-btn { border: 1px solid var(--blue); color: var(--blue); background: none; font-size: 0.7rem; padding: 3px 8px; cursor: pointer; }
-        .skill-btn.active { background: var(--blue); color: #000; box-shadow: 0 0 5px var(--blue); }
-        .skill-locked { color: #444; border-color: #333; }
+        .skill-btn { border: 1px solid #555; color: #555; background: none; font-size: 0.7rem; padding: 4px 10px; cursor: pointer; text-transform: uppercase; }
+        .skill-btn.active { background: var(--blue); color: #000; border-color: var(--blue); box-shadow: 0 0 8px var(--blue); font-weight: bold;}
+        .skill-btn.passive { border: 1px solid #333; color: #888; cursor: default; }
 
         /* QUESTS */
         .quest-item { display: flex; flex-direction: column; padding: 15px 0; border-bottom: 1px solid #333; }
         .q-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .q-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px;}
         .q-btn { background: #333; border: 1px solid #555; color: #fff; width: 30px; height: 30px; cursor: pointer; font-weight: bold; }
-        .q-val { font-family: monospace; font-size: 1rem; color: var(--blue); width: 80px; text-align: center;}
+        .q-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .q-val { font-family: monospace; font-size: 1rem; color: var(--blue); width: 100px; text-align: center;}
         .q-complete { color: var(--green); }
         .q-over { color: var(--gold); text-shadow: 0 0 5px var(--gold); }
 
@@ -237,7 +238,7 @@
                 </div>
 
                 <div class="skills-container">
-                    <div class="skill-header">SKILLS</div>
+                    <div class="skill-header">SKILLS <small style="font-weight:normal;color:#666;font-size:0.7rem">(Click to Toggle)</small></div>
                     <div id="skills-list">
                         </div>
                 </div>
@@ -291,8 +292,8 @@
 
     <script>
         const trans = {
-            en: { status: "STATUS", quests: "DAILY QUESTS", shop: "SHOP", pts: "POINTS:", gold: "GOLD:", settings: "SETTINGS", inv: "INVENTORY", empty: "Empty", use: "USE", sell: "SELL", equip: "EQUIP", unequip: "UNEQUIP", claim: "[ CLAIM REWARDS ]", q1: "Push-ups", q2: "Sit-ups", q3: "Squats", q4: "Running (km)", j0: "NONE", j2: "SHADOW MONARCH", j3: "SOUL SHEPHERD", j4: "TITAN OF TWILIGHT", t0: "NONE", t1: "WOLF ASSASSIN", t2: "ONE WHO OVERCAME ADVERSITY", t3: "DEMON SLAYER" },
-            pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", equip: "EQUIPAR", unequip: "DESEQUIPAR", claim: "[ RESGATAR ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Corrida (km)", j0: "NENHUM", j2: "MONARCA DAS SOMBRAS", j3: "PASTOR DE ALMAS", j4: "TITÃ DO CREPÚSCULO", t0: "NENHUM", t1: "ASSASSINO DE LOBOS", t2: "SUPEROU A ADVERSIDADE", t3: "ASSASSINO DE DEMÔNIOS" }
+            en: { status: "STATUS", quests: "DAILY QUESTS", shop: "SHOP", pts: "POINTS:", gold: "GOLD:", settings: "SETTINGS", inv: "INVENTORY", empty: "Empty", use: "USE", sell: "SELL", equip: "EQUIP", unequip: "UNEQUIP", claim: "[ CLAIM REWARDS ]", q1: "Push-ups", q2: "Sit-ups", q3: "Squats", q4: "Running (km)", j0: "NONE", j1: "NECROMANCER", j2: "SHADOW MONARCH", t0: "NONE", t1: "WOLF SLAYER", t2: "THE ONE WHO OVERCAME ADVERSITY", t3: "DEMON SLAYER" },
+            pt: { status: "STATUS", quests: "MISSÕES", shop: "LOJA", pts: "PONTOS:", gold: "OURO:", settings: "CONFIGURAÇÕES", inv: "INVENTÁRIO", empty: "Vazio", use: "USAR", sell: "VENDER", equip: "EQUIPAR", unequip: "DESEQUIPAR", claim: "[ RESGATAR ]", q1: "Flexões", q2: "Abdominais", q3: "Agachamentos", q4: "Corrida (km)", j0: "NENHUM", j1: "NECROMANTE", j2: "MONARCA DAS SOMBRAS", t0: "NENHUM", t1: "MATADOR DE LOBOS", t2: "AQUELE QUE SUPEROU A ADVERSIDADE", t3: "MATADOR DE DEMÔNIOS" }
         };
 
         const MIN = 60000;
@@ -306,11 +307,11 @@
             "Blessed Box": { type: 'consume', price: 0, desc: "Rare Rewards" },
             "Cursed Box": { type: 'consume', price: 0, desc: "Risky Rewards" },
             "Instance Key": { type: 'misc', price: 0, desc: "Unlocks Subway" },
+            "Demon Castle Key": { type: 'misc', price: 0, desc: "Unlocks S-Rank" },
             "E-Rank Dagger": { type: 'equip', price: 500, stats: {STR: 5, AGI: 2}, desc: "Basic Dagger" },
             "Kasaka's Venom Fang": { type: 'equip', price: 3000, stats: {STR: 15, AGI: 15}, desc: "Paralysis Effect" },
             "Knight Killer": { type: 'equip', price: 1500, stats: {STR: 25, VIT: 5}, desc: "Armor Pierce" },
             "Demon King's Dagger": { type: 'equip', price: 20000, stats: {STR: 60, AGI: 40}, desc: "S-Rank Weapon" },
-            // Drops
             "Goblin Stone": { type: 'misc', price: 10 }, "Lycan Fang": { type: 'misc', price: 25 }, "Centipede Shell": { type: 'misc', price: 50 }, "Ice Crystal": { type: 'misc', price: 100 }, "Orc Tusk": { type: 'misc', price: 250 }, "Ant Wing": { type: 'misc', price: 1000 }, "Baruka's Dagger": { type: 'equip', price: 5000, stats: {AGI:35, STR:10} }
         };
 
@@ -325,15 +326,16 @@
             { name: "Instant Dungeon: Subway", mob: "Blue Venom-Fang Kasaka", diff: "purple", drop: "Kasaka's Venom Fang", price: 0, xp: 600, cost: 50, visualTime: 15, cooldownTime: 0, minLvl: 1, isInstance: true } 
         ];
 
+        // ADDED isActive to skills
         const skillsData = {
-            "Sprint": { lvl: 1, type: "active", desc: "Speed +30%", active: false },
-            "Stealth": { lvl: 10, type: "active", desc: "Invisible", active: false },
-            "Vital Strike": { lvl: 15, type: "passive", desc: "Crit Chance +", active: true },
-            "Courage of the Weak": { lvl: 1, type: "passive", desc: "Detox Buff", active: true } // Desbloqueia cedo para facilitar
+            "Sprint": { lvl: 1, type: "active", desc: "Speed +30% (Costs Fatigue)", active: false },
+            "Stealth": { lvl: 10, type: "active", desc: "Crit Rate + (Costs Fatigue)", active: false },
+            "Vital Strike": { lvl: 15, type: "passive", desc: "Gold Drops +", active: true },
+            "Courage of the Weak": { lvl: 1, type: "passive", desc: "Detox Buff", active: true } 
         };
 
         let missionTimer = null; 
-        let pendingRewards = null; // Armazena recompensas pendentes para o modal
+        let pendingRewards = null;
 
         function msToTime(duration) {
             let seconds = Math.floor((duration / 1000) % 60);
@@ -352,42 +354,55 @@
                     {id:'q1', current:0, target:100, step:10}, 
                     {id:'q2', current:0, target:100, step:10}, 
                     {id:'q3', current:0, target:100, step:10}, 
-                    {id:'q4', current:0, target:10, step:1} // Run
+                    {id:'q4', current:0, target:10, step:1} 
                 ],
-                unlockedSkills: ["Sprint", "Courage of the Weak"], // Inicia com Courage para testar
+                unlockedSkills: ["Sprint", "Courage of the Weak"], 
+                activeSkills: [], // List of currently active skills names
                 dungeonCooldowns: [],
                 lastLoginDay: new Date().toDateString(),
                 dailyCompleted: false,
                 instanceUnlocked: false
             },
             init() {
-                const s = localStorage.getItem('solo_v46');
+                const s = localStorage.getItem('solo_v47');
                 if(s) {
                     const parsed = JSON.parse(s);
                     this.data = {...this.data, ...parsed};
-                    // Migração de dados antigos se necessário
-                    if(!this.data.quests[0].target) {
-                        // Reset quests format for V46
-                        this.data.quests = [
-                            {id:'q1', current:0, target:100, step:10}, 
-                            {id:'q2', current:0, target:100, step:10}, 
-                            {id:'q3', current:0, target:100, step:10}, 
-                            {id:'q4', current:0, target:10, step:1}
-                        ];
-                    }
+                    if(!this.data.activeSkills) this.data.activeSkills = [];
                 }
-                
                 this.checkDailyPenalty();
-                
                 ui.tab('status'); 
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v46', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v47', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v46'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v47'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             getMaxXP(lvl) { return lvl * 100; },
+            
+            // RANK LOGIC FIX (E to S)
+            getRank(l) { 
+                if(l<=10) return 'E'; 
+                if(l<=20) return 'D'; 
+                if(l<=40) return 'C'; 
+                if(l<=60) return 'B'; 
+                if(l<=80) return 'A'; 
+                return 'S'; 
+            },
+            // TITLE/JOB LORE FIX
+            getJobKey(l) { 
+                if(l < 40) return 'j0'; // None
+                if(l < 100) return 'j1'; // Necromancer (Simplificado)
+                return 'j2'; // Shadow Monarch
+            },
+            getTitleKey(l) { 
+                if(l < 10) return 't0'; 
+                if(l < 30) return 't1'; // Wolf Slayer
+                if(l < 60) return 't2'; // Overcame Adversity
+                return 't3'; // Demon Slayer
+            },
+
             getTotalStats() {
                 let t = { ...this.data.stats };
                 if (this.data.equipped) {
@@ -397,16 +412,28 @@
                 return t;
             },
 
-            // --- PENALTY LOGIC ---
+            // --- SKILL LOGIC ---
+            toggleSkill(skillName) {
+                const skillInfo = skillsData[skillName];
+                if(skillInfo.type === 'passive') return; // Passives always active
+
+                const idx = this.data.activeSkills.indexOf(skillName);
+                if(idx > -1) {
+                    this.data.activeSkills.splice(idx, 1); // Turn off
+                } else {
+                    this.data.activeSkills.push(skillName); // Turn on
+                }
+                this.save();
+                ui.render();
+            },
+
             checkDailyPenalty() {
                 const today = new Date().toDateString();
                 if(this.data.lastLoginDay !== today) {
-                    // Dia mudou. Se não completou ontem, penalidade.
                     if(!this.data.dailyCompleted) {
                         document.getElementById('penalty-modal').style.display = 'flex';
-                        this.data.fatigue = 100; // Penalidade
+                        this.data.fatigue = 100; 
                     }
-                    // Reset
                     this.data.quests.forEach(q => q.current = 0);
                     this.data.dailyCompleted = false;
                     this.data.lastLoginDay = today;
@@ -422,28 +449,32 @@
                 if(document.getElementById('tab-dungeon').classList.contains('active')) {
                     ui.updateDungeonButtons();
                 }
-                // Secret Quest Check (0.05% chance per second)
-                if(Math.random() < 0.0005) {
-                    ui.notify("SECRET QUEST: HIDDEN BOSS NEARBY");
-                }
+                // Random event logic could go here
             },
 
-            // --- QUEST LOGIC (COUNTERS) ---
+            // --- QUEST FIX (DOUBLE LIMIT) ---
             addQuestProgress(i) {
                 if(this.data.dailyCompleted) return;
                 const q = this.data.quests[i];
-                q.current += q.step;
-                this.save();
-                ui.render();
+                // Allow up to double the target
+                if (q.current < q.target * 2) {
+                    q.current += q.step;
+                    this.save();
+                    ui.render();
+                } else {
+                    ui.notify("MAXIMUM LIMIT REACHED");
+                }
             },
 
+            // --- CLAIM FIX ---
             prepareReward() {
                 if(this.data.dailyCompleted) return;
 
+                // Check basic completion
                 const allComplete = this.data.quests.every(q => q.current >= q.target);
                 if(!allComplete) { ui.notify("COMPLETE ALL QUESTS"); return; }
 
-                // Check Over-achievement (Double)
+                // Check Hidden (Double)
                 const isHidden = this.data.quests.every(q => q.current >= q.target * 2);
                 
                 pendingRewards = [];
@@ -452,12 +483,11 @@
                 
                 if(isHidden) {
                     pendingRewards.push("Blessed Box");
-                    pendingRewards.push("Hidden Reward: Key?");
+                    pendingRewards.push("Hidden Reward: Cursed Box");
                 } else {
                     pendingRewards.push("Random Box");
                 }
 
-                // Show Modal
                 ui.showRewardModal(pendingRewards, isHidden);
             },
 
@@ -471,11 +501,7 @@
                 pendingRewards.forEach(r => {
                     if(r === "Random Box") this.data.inventory.push("Random Box");
                     if(r === "Blessed Box") this.data.inventory.push("Blessed Box");
-                    // Chance baixa de chave S-Rank na Hidden Reward
-                    if(r.includes("Hidden Reward") && Math.random() < 0.05) {
-                        this.data.inventory.push("Demon Castle Key"); 
-                        ui.notify("OBTAINED: S-RANK KEY");
-                    }
+                    if(r.includes("Cursed")) this.data.inventory.push("Cursed Box");
                 });
 
                 this.data.dailyCompleted = true;
@@ -519,6 +545,11 @@
                 const totalStats = this.getTotalStats();
                 const vitBonus = Math.floor(totalStats.VIT * 0.2);
                 let finalCost = dg.cost - vitBonus;
+
+                // SKILL CHECK: Stealth costs extra fatigue?
+                const useStealth = this.data.activeSkills.includes("Stealth");
+                if(useStealth) finalCost += 20;
+
                 if (finalCost < 1) finalCost = 1;
 
                 if(this.data.fatigue + finalCost > 100) { ui.notify("FATIGUE TOO HIGH!"); return; }
@@ -527,11 +558,10 @@
                 this.save();
                 ui.render();
                 
+                // SKILL CHECK: Sprint reduces time
                 const agiMod = Math.min(0.6, totalStats.AGI * 0.02);
-                // Skill Sprint buff
-                const hasSprint = this.data.unlockedSkills.includes("Sprint"); 
-                // Simplificação: Sprint é passivo/ativo. Vamos assumir ativo automaticamente na dungeon.
-                const sprintMod = hasSprint ? 0.3 : 0;
+                const useSprint = this.data.activeSkills.includes("Sprint");
+                const sprintMod = useSprint ? 0.3 : 0; // 30% reduction
 
                 const finalTime = Math.max(1, dg.visualTime * (1 - agiMod - sprintMod));
 
@@ -539,7 +569,8 @@
                     if(!dg.isInstance) this.data.dungeonCooldowns[idx] = Date.now() + dg.cooldownTime;
 
                     let winChance = 0.75 + (totalStats.STR * 0.01);
-                    if (winChance > 0.98) winChance = 0.98;
+                    if(useStealth) winChance += 0.20; // Stealth bonus
+                    if (winChance > 0.99) winChance = 0.99;
 
                     ui.stopMissionTimer(); 
                     
@@ -548,6 +579,14 @@
                         const finalXP = Math.floor(dg.xp * intBonus);
                         this.data.xp += finalXP; 
                         
+                        // SKILL CHECK: Vital Strike (Extra Gold)
+                        const useVital = this.data.unlockedSkills.includes("Vital Strike");
+                        if(useVital) {
+                            const extraGold = 50;
+                            this.data.gold += extraGold;
+                            ui.notify("CRITICAL: EXTRA GOLD");
+                        }
+
                         const dropItem = itemsDB[dg.drop];
                         if (dropItem && dropItem.type === 'equip' && (this.data.inventory.includes(dg.drop) || this.data.equipped === dg.drop)) {
                             this.data.gold += (dropItem.price || 1000);
@@ -570,7 +609,6 @@
                 const item = this.data.inventory[index];
                 const dbItem = itemsDB[item];
 
-                // Equip logic
                 if (dbItem && dbItem.type === 'equip') {
                     if (this.data.equipped) this.data.inventory.push(this.data.equipped);
                     this.data.equipped = item;
@@ -579,18 +617,15 @@
                     return;
                 }
 
-                // TOXIC ITEM LOGIC (Courage of the Weak)
                 if(dbItem && dbItem.type === 'toxic') {
                     this.data.inventory.splice(index, 1);
-                    
+                    // SKILL CHECK: Courage of Weak
                     const hasCourage = this.data.unlockedSkills.includes("Courage of the Weak");
                     if(hasCourage) {
-                        // DETOX EFFECT
                         ui.triggerDetox();
-                        this.data.fatigue = Math.max(0, this.data.fatigue - 20); // Cura em vez de ferir
+                        this.data.fatigue = Math.max(0, this.data.fatigue - 20);
                         ui.notify("DETOXIFICADO: CORAGEM DOS FRACOS");
                     } else {
-                        // TOXIC EFFECT
                         ui.triggerToxic();
                         this.data.fatigue = Math.min(100, this.data.fatigue + 20);
                         ui.notify("ENVENENADO!");
@@ -599,7 +634,6 @@
                     return;
                 }
 
-                // Loot Boxes
                 if(item.includes('Box')) {
                     this.data.inventory.splice(index, 1);
                     if(item === 'Cursed Box') {
@@ -770,9 +804,11 @@
                 document.getElementById('xp-bar').style.width = xpPercent + "%";
                 document.getElementById('val-xp-txt').innerText = `${Math.floor(d.xp)} / ${maxXP}`;
                 document.getElementById('fatigue-bar').style.width = d.fatigue + "%";
-                document.getElementById('val-rank').innerText = "PLAYER"; // Changed to 'Player' as in Solo Leveling initially
-                document.getElementById('val-job').innerText = t[game.data.lvl > 40 ? 'j2' : 'j0'];
-                document.getElementById('val-title').innerText = t[game.data.lvl > 15 ? 't1' : 't0'];
+                
+                // RANK FIX
+                document.getElementById('val-rank').innerText = game.getRank(d.lvl);
+                document.getElementById('val-job').innerText = t[game.getJobKey(d.lvl)];
+                document.getElementById('val-title').innerText = t[game.getTitleKey(d.lvl)];
                 
                 const totalStats = game.getTotalStats();
                 for(let k in d.stats) {
@@ -786,35 +822,46 @@
                     document.getElementById('val-equipped').innerHTML += ` <button class="btn-small unequip" onclick="game.unequip()">X</button>`;
                 } else { document.getElementById('val-equipped').innerText = "NONE"; }
                 
-                // RENDER SKILLS
+                // RENDER SKILLS WITH TOGGLE
                 const sl = document.getElementById('skills-list'); sl.innerHTML = '';
                 for(let sKey in skillsData) {
                     const sk = skillsData[sKey];
                     const unlocked = d.unlockedSkills.includes(sKey);
                     if(unlocked) {
+                        const isActive = d.activeSkills.includes(sKey);
+                        const isPassive = sk.type === 'passive';
+                        const activeClass = (isActive || isPassive) ? 'active' : '';
+                        const passiveClass = isPassive ? 'passive' : '';
+                        const statusText = isPassive ? 'PASSIVE' : (isActive ? 'ON' : 'OFF');
+                        const onclick = isPassive ? '' : `onclick="game.toggleSkill('${sKey}')"`;
+                        
                         sl.innerHTML += `
                         <div class="skill-card">
                             <div><div class="skill-name">${sKey}</div><div class="skill-desc">${sk.desc}</div></div>
-                            <button class="skill-btn active">ACTIVE</button>
+                            <button class="skill-btn ${activeClass} ${passiveClass}" ${onclick}>${statusText}</button>
                         </div>`;
                     }
                 }
 
-                // RENDER QUESTS WITH COUNTERS
+                // RENDER QUESTS WITH DOUBLE LIMIT
                 const qL = document.getElementById('q-list'); qL.innerHTML = '';
                 d.quests.forEach((q, i) => {
                     const isComplete = q.current >= q.target;
                     const isOver = q.current >= q.target * 2;
                     const statusClass = isOver ? 'q-over' : (isComplete ? 'q-complete' : '');
+                    const statusText = isOver ? 'HIDDEN COMPLETE' : (isComplete ? 'COMPLETE' : 'INCOMPLETE');
+                    // Lock button at double limit
+                    const disabled = isOver ? 'disabled' : '';
+
                     qL.innerHTML += `
                     <div class="quest-item">
                         <div class="q-top">
                             <span>${t[q.id]}</span>
-                            <span class="${statusClass}">[ ${isOver ? 'HIDDEN' : (isComplete ? 'COMPLETE' : 'INCOMPLETE')} ]</span>
+                            <span class="${statusClass}">[ ${statusText} ]</span>
                         </div>
                         <div class="q-controls">
                             <span class="q-val">${q.current} / ${q.target}</span>
-                            <button class="q-btn" onclick="game.addQuestProgress(${i})">+</button>
+                            <button class="q-btn" onclick="game.addQuestProgress(${i})" ${disabled}>+</button>
                         </div>
                     </div>`;
                 });
