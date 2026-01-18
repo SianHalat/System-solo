@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM V30</title>
+    <title>SYSTEM V31</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Noto+Sans+SC&family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -11,54 +11,24 @@
             --glow: 0 0 10px #00eaff; 
             --bg: #02050a; 
             --red: #ff3333; 
+            /* Estilo Unificado: Texto Branco + Sombra Azul */
+            --sys-text-glow: 0 0 8px var(--blue);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; outline: none;}
         body { background: var(--bg); color: #fff; font-family: 'Chakra Petch', sans-serif; min-height: 100vh; padding: 15px; padding-bottom: 90px; }
 
-        /* --- ESTILO DO GOLD (CONSISTÊNCIA COM STATUS) --- */
-        
-        .gold-wrapper {
-            display: inline-flex;
-            align-items: baseline;
-        }
-
-        /* O Número: Igual aos Stats (Branco com Glow Azul Sistema) */
-        .gold-num {
-            color: #fff;
-            font-family: 'Chakra Petch', sans-serif;
+        /* --- CLASSE DE ESTILO UNIFICADO (BRANCO + GLOW AZUL) --- */
+        .sys-glow-text {
+            color: #fff !important;
+            text-shadow: var(--sys-text-glow);
             font-weight: 700;
-            text-shadow: 0 0 8px var(--blue);
-            letter-spacing: 1px;
-            margin-right: 4px;
         }
 
-        /* O Ícone G: Borda Branca, Letra Branca, Glow Azul Sistema */
-        .gold-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            
-            /* Borda Branca */
-            border: 1.5px solid #fff; 
-            border-radius: 50%;
-            
-            /* Glow Azul na borda */
-            box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue);
-            
-            /* Letra Branca */
-            color: #fff;
-            font-size: 0.7rem;
-            font-weight: 800;
-            
-            /* Glow Azul na letra */
-            text-shadow: 0 0 5px var(--blue);
-            
-            position: relative;
-            top: -1px;
-        }
+        /* --- ESTILO DO GOLD --- */
+        .gold-wrapper { display: inline-flex; align-items: baseline; }
+        .gold-num { color: #fff; font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-shadow: var(--sys-text-glow); letter-spacing: 1px; margin-right: 4px; }
+        .gold-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1.5px solid #fff; border-radius: 50%; box-shadow: 0 0 8px var(--blue), inset 0 0 2px var(--blue); color: #fff; font-size: 0.7rem; font-weight: 800; text-shadow: 0 0 5px var(--blue); position: relative; top: -1px; }
 
         /* MOLDURA PRINCIPAL */
         .main-frame { width: 100%; max-width: 500px; border: 2px solid #fff; padding: 25px; background: rgba(2, 8, 15, 0.95); position: relative; box-shadow: var(--glow); margin: 0 auto; padding-top: 20px;}
@@ -67,14 +37,28 @@
 
         /* UI TOPO */
         #ui-timer-container { position: absolute; top: 25px; left: 25px; z-index: 50; transition: opacity 0.3s ease; }
-        .timer { font-size: 1rem; font-weight: bold; color: var(--blue); text-shadow: 0 0 5px var(--blue); }
+        
+        /* TIMER (Agora Branco + Glow) */
+        .timer { 
+            font-size: 1rem; 
+            font-weight: bold; 
+            color: #fff; 
+            text-shadow: var(--sys-text-glow); 
+        }
 
         .top-right-stack { position: absolute; top: 25px; right: 25px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 50; }
         .kebab-btn { width: 20px; height: 20px; position: relative; background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .kebab-btn::before { content: ''; width: 4px; height: 4px; background: var(--blue); border-radius: 50%; box-shadow: 0 -7px 0 var(--blue), 0 7px 0 var(--blue); filter: drop-shadow(0 0 2px var(--blue)); }
 
         .res-row { font-size: 0.8rem; color: #8899aa; display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
-        .res-val-blue { color: var(--blue); font-weight: bold; font-size: 1.1rem; text-shadow: 0 0 5px var(--blue); }
+        
+        /* POINTS (Agora Branco + Glow) */
+        .res-val-blue { 
+            color: #fff; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            text-shadow: var(--sys-text-glow); 
+        }
 
         /* ANIMAÇÕES */
         @keyframes system-fade { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -87,8 +71,28 @@
         h2.tab-title { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--blue); margin-bottom: 30px; font-size: 1.8rem; margin-top: 10px; }
         .header-grid { display: grid; grid-template-columns: auto 1fr; gap: 25px; align-items: end; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 20px; margin-bottom: 20px; }
         .lvl-num { font-size: 4.5rem; font-weight: 700; text-shadow: 0 0 15px #fff; line-height: 0.8; }
+        
+        .info-box { display: flex; flex-direction: column; gap: 6px; }
         .info-row { font-size: 0.85rem; color: #888; display: flex; align-items: center; margin-bottom: 4px; }
-        .info-val { color: var(--blue); font-weight: bold; text-transform: uppercase; }
+        
+        /* JOB & TITLE (Agora Branco + Glow) */
+        .info-val { 
+            color: #fff; 
+            font-weight: bold; 
+            text-transform: uppercase;
+            text-shadow: var(--sys-text-glow);
+        }
+        
+        /* RANK BOX (Letra Branca + Glow) */
+        .rank-box {
+            color: #fff;
+            border: 1px solid var(--blue);
+            padding: 0 5px;
+            margin-left: 5px;
+            font-weight: bold;
+            text-shadow: var(--sys-text-glow);
+            box-shadow: 0 0 5px rgba(0, 234, 255, 0.3); /* Leve brilho na caixa */
+        }
         
         .bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 10px; }
         .bar-fill { height: 100%; width: 0%; transition: width 0.5s ease; }
@@ -97,7 +101,10 @@
 
         .stat-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 8px; }
         .stat-label { font-size: 1.2rem; font-weight: 600; color: #ccc; width: 50px; }
-        .stat-val { font-size: 1.6rem; font-weight: 700; margin-left: 10px; color: #fff; text-shadow: 0 0 8px var(--blue); }
+        
+        /* STATS (STR, AGI...) JÁ ERAM ASSIM, MANTENDO PADRÃO */
+        .stat-val { font-size: 1.6rem; font-weight: 700; margin-left: 10px; color: #fff; text-shadow: var(--sys-text-glow); }
+        
         .plus-btn { width: 24px; height: 24px; border: 1px solid var(--blue); margin-left: auto; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--blue); }
 
         /* QUESTS & DUNGEONS */
@@ -183,7 +190,7 @@
             <div class="header-grid">
                 <div><div id="val-lvl" class="lvl-num">1</div><div style="font-size:0.7rem; color:var(--blue); text-align:center;">LEVEL</div></div>
                 <div class="info-box">
-                    <div class="info-row">RANK: <span id="val-rank" style="color:#fff; border:1px solid var(--blue); padding:0 5px; margin-left:5px;">E</span></div>
+                    <div class="info-row">RANK: <span id="val-rank" class="rank-box">E</span></div>
                     <div class="info-row">JOB: <span id="val-job" class="info-val" style="margin-left:5px;">NONE</span></div>
                     <div class="info-row">TITLE: <span id="val-title" class="info-val" style="margin-left:5px;">NONE</span></div>
                     <div style="font-size:0.6rem; margin-top:10px;">XP</div>
@@ -253,14 +260,14 @@
         const game = {
             data: { stats: { STR: 10, VIT: 10, AGI: 10, INT: 10, PER: 10 }, pts: 3, lvl: 1, gold: 0, xp: 0, fatigue: 0, lang: 'en', inventory: [], quests: [{id:'q1', done:false}, {id:'q2', done:false}, {id:'q3', done:false}, {id:'q4', done:false}] },
             init() {
-                const s = localStorage.getItem('solo_v30');
+                const s = localStorage.getItem('solo_v31');
                 if(s) this.data = JSON.parse(s);
                 ui.render();
                 setInterval(() => this.tick(), 1000);
             },
-            save() { localStorage.setItem('solo_v30', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('solo_v31', JSON.stringify(this.data)); },
             setLang(l) { this.data.lang = l; this.save(); ui.render(); },
-            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v30'); location.reload(); } },
+            reset() { if(confirm("RESET SYSTEM?")) { localStorage.removeItem('solo_v31'); location.reload(); } },
             add(k) { if(this.data.pts > 0) { this.data.stats[k]++; this.data.pts--; this.save(); ui.render(); } },
             tick() {
                 const n = new Date(); const e = new Date(); e.setHours(23,59,59);
